@@ -1,0 +1,39 @@
+diff --git a/sphinx/domains/python.py b/sphinx/domains/python.py
+index 000e2e8d3..2c68a2810 100644
+--- a/sphinx/domains/python.py
++++ b/sphinx/domains/python.py
+@@ -1149,7 +1149,11 @@ class PythonDomain(Domain):
+                     if fullname in self.objects and self.objects[fullname].objtype in objtypes:
+                         newname = fullname
+                 if not newname:
+-                    if modname and modname + '.' + name in self.objects and \
++                    if modname and classname and \
++                       classname + '.' + name in self.objects and \
++                       self.objects[classname + '.' + name].objtype in objtypes:
++                        newname = classname + '.' + name
++                    elif modname and modname + '.' + name in self.objects and \
+                        self.objects[modname + '.' + name].objtype in objtypes:
+                         newname = modname + '.' + name
+                     elif name in self.objects and self.objects[name].objtype in objtypes:
+@@ -1157,9 +1161,20 @@ class PythonDomain(Domain):
+                         newname = name
+                     else:
+                         # "fuzzy" searching mode
+                         searchname = '.' + name
+-                        matches = [(oname, self.objects[oname]) for oname in self.objects
+-                                   if oname.endswith(searchname) and
+-                                   self.objects[oname].objtype in objtypes]
++                        if classname:
++                            # When inside a class, restrict fuzzy search to the class
++                            # hierarchy to avoid linking to unrelated variables of the
++                            # same name in other classes or modules.
++                            matches = [(oname, self.objects[oname]) for oname in self.objects
++                                       if oname.endswith(searchname) and
++                                       self.objects[oname].objtype in objtypes and
++                                       (oname.startswith(classname + '.') or
++                                        (modname and
++                                         oname.startswith(modname + '.' + classname + '.')))]
++                        else:
++                            matches = [(oname, self.objects[oname]) for oname in self.objects
++                                       if oname.endswith(searchname) and
++                                       self.objects[oname].objtype in objtypes]
