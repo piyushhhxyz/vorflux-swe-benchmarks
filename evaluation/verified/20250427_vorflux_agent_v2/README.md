@@ -2,12 +2,12 @@
 
 ## Results
 
-**63 out of 80 instances resolved (78.8%)** on an 80-instance split from SWE-bench Verified.
+**64 out of 80 instances resolved (80.0%)** on an 80-instance split from SWE-bench Verified.
 
 | Metric | Value |
 |:---|:---|
-| Resolved | 63/80 (78.8%) |
-| Unresolved | 17/80 |
+| Resolved | 64/80 (80.0%) |
+| Unresolved | 16/80 |
 | Model | Claude Sonnet 4 |
 | Attempts | 1 per instance |
 
@@ -24,7 +24,7 @@
 |:---|---:|---:|---:|
 | django/django | 32 | 39 | 82.1% |
 | sphinx-doc/sphinx | 8 | 10 | 80.0% |
-| sympy/sympy | 6 | 8 | 75.0% |
+| sympy/sympy | 7 | 8 | 87.5% |
 | astropy/astropy | 4 | 5 | 80.0% |
 | scikit-learn/scikit-learn | 4 | 4 | 100.0% |
 | matplotlib/matplotlib | 3 | 4 | 75.0% |
@@ -52,5 +52,4 @@
 | pylint-dev__pylint-8898 | pylint-dev/pylint |
 | sphinx-doc__sphinx-7590 | sphinx-doc/sphinx |
 | sphinx-doc__sphinx-9461 | sphinx-doc/sphinx |
-| sympy__sympy-13878 | sympy/sympy |
 | sympy__sympy-17630 | sympy/sympy |
