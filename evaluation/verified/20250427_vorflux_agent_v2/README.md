@@ -2,12 +2,12 @@
 
 ## Results
 
-**64 out of 80 instances resolved (80.0%)** on an 80-instance split from SWE-bench Verified.
+**65 out of 80 instances resolved (81.2%)** on an 80-instance split from SWE-bench Verified.
 
 | Metric | Value |
 |:---|:---|
-| Resolved | 64/80 (80.0%) |
-| Unresolved | 16/80 |
+| Resolved | 65/80 (81.2%) |
+| Unresolved | 15/80 |
 | Model | Claude Sonnet 4 |
 | Attempts | 1 per instance |
 
@@ -22,7 +22,7 @@
 
 | Repository | Resolved | Total | Score |
 |:---|---:|---:|---:|
-| django/django | 32 | 39 | 82.1% |
+| django/django | 33 | 39 | 84.6% |
 | sphinx-doc/sphinx | 8 | 10 | 80.0% |
 | sympy/sympy | 7 | 8 | 87.5% |
 | astropy/astropy | 4 | 5 | 80.0% |
@@ -43,7 +43,6 @@
 | django__django-12325 | django/django |
 | django__django-13212 | django/django |
 | django__django-13513 | django/django |
-| django__django-15629 | django/django |
 | django__django-16263 | django/django |
 | matplotlib__matplotlib-26208 | matplotlib/matplotlib |
 | pydata__xarray-6992 | pydata/xarray |
