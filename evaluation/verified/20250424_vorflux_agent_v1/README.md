@@ -23,5 +23,5 @@ Resolved by Repository
 
 - **Model:** Claude Sonnet 4
 - **Attempts:** 1
-- **Dataset:** SWE-bench Verified (20-instance subset)
+- **Dataset:** SWE-bench Verified
 - **Evaluation:** Standard SWE-bench Docker harness

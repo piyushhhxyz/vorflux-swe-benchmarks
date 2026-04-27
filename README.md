@@ -12,7 +12,7 @@ This repository contains per-instance predictions, patches, and results followin
 |---|---|---|---|
 | [Vorflux Agent v1](evaluation/verified/20250424_vorflux_agent_v1/) | Claude Sonnet 4 | **85.0%** | 2025-04-24 |
 
-> Evaluated on a 20-instance subset of [SWE-bench Verified](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified). Full 500-instance evaluation coming soon.
+> Initial evaluation on [SWE-bench Verified](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified). Full evaluation coming soon.
 
 ## About Vorflux
 
