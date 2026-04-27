@@ -2,12 +2,12 @@
 
 ## Results
 
-**46 out of 50 instances resolved (92.0%)** on a 50-instance split from SWE-bench Verified.
+**63 out of 80 instances resolved (78.8%)** on an 80-instance split from SWE-bench Verified.
 
 | Metric | Value |
 |:---|:---|
-| Resolved | 46/50 (92.0%) |
-| Unresolved | 4/50 |
+| Resolved | 63/80 (78.8%) |
+| Unresolved | 17/80 |
 | Model | Claude Sonnet 4 |
 | Attempts | 1 per instance |
 
@@ -22,22 +22,35 @@
 
 | Repository | Resolved | Total | Score |
 |:---|---:|---:|---:|
-| django/django | 20 | 22 | 90.9% |
-| sphinx-doc/sphinx | 7 | 7 | 100.0% |
-| sympy/sympy | 5 | 5 | 100.0% |
-| astropy/astropy | 4 | 4 | 100.0% |
+| django/django | 32 | 39 | 82.1% |
+| sphinx-doc/sphinx | 8 | 10 | 80.0% |
+| sympy/sympy | 6 | 8 | 75.0% |
+| astropy/astropy | 4 | 5 | 80.0% |
 | scikit-learn/scikit-learn | 4 | 4 | 100.0% |
 | matplotlib/matplotlib | 3 | 4 | 75.0% |
+| pytest-dev/pytest | 3 | 3 | 100.0% |
+| pydata/xarray | 2 | 3 | 66.7% |
 | mwaskom/seaborn | 1 | 1 | 100.0% |
-| pydata/xarray | 1 | 1 | 100.0% |
-| pytest-dev/pytest | 1 | 1 | 100.0% |
-| pylint-dev/pylint | 0 | 1 | 0.0% |
+| pylint-dev/pylint | 0 | 3 | 0.0% |
 
 ## Unresolved Instances
 
 | Instance | Repository |
 |:---|:---|
+| astropy__astropy-14369 | astropy/astropy |
 | django__django-10999 | django/django |
+| django__django-11400 | django/django |
+| django__django-12325 | django/django |
+| django__django-13212 | django/django |
 | django__django-13513 | django/django |
+| django__django-15629 | django/django |
+| django__django-16263 | django/django |
 | matplotlib__matplotlib-26208 | matplotlib/matplotlib |
+| pydata__xarray-6992 | pydata/xarray |
+| pylint-dev__pylint-4551 | pylint-dev/pylint |
 | pylint-dev__pylint-7080 | pylint-dev/pylint |
+| pylint-dev__pylint-8898 | pylint-dev/pylint |
+| sphinx-doc__sphinx-7590 | sphinx-doc/sphinx |
+| sphinx-doc__sphinx-9461 | sphinx-doc/sphinx |
+| sympy__sympy-13878 | sympy/sympy |
+| sympy__sympy-17630 | sympy/sympy |
