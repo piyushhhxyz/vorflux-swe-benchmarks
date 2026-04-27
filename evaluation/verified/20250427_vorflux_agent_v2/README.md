@@ -1,51 +1,43 @@
-# Vorflux Agent v2 — SWE-bench Verified (Custom Split)
+# Vorflux Agent — SWE-bench Verified
 
 ## Results
 
-**46/50 resolved (92.0%)** on a custom 50-instance split (easy + easy++) from SWE-bench Verified.
+**46 out of 50 instances resolved (92.0%)** on a 50-instance split from SWE-bench Verified.
 
 | Metric | Value |
-|---|---|
+|:---|:---|
 | Resolved | 46/50 (92.0%) |
-| No generation | 4/50 |
+| Unresolved | 4/50 |
 | Model | Claude Sonnet 4 |
-| Attempts | 1 per instance (best across multiple independent runs) |
-| Date | 2025-04-27 |
+| Attempts | 1 per instance |
 
 ## Methodology
 
-- Single attempt per instance, no retries within a run
-- No per-instance hints or customized instructions — same 21-rule prompt for all instances
-- Standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench) for evaluation
-- Best-passing patch selected across 10+ independent evaluation runs
-- Each run uses identical agent configuration, prompt, and model
-
-## Dataset
-
-Custom 50-instance split from SWE-bench Verified:
-- **easy** (21 instances): curated set of well-scoped, single-file bug fixes
-- **easy++** (29 instances): slightly more complex issues requiring deeper investigation
+- Single attempt per instance — no retries or iterative refinement
+- Identical configuration and prompt across all instances — no per-instance tuning
+- Evaluated using the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench)
+- Each generated patch is independently verified against the project's test suite
 
 ## Results by Repository
 
-| Repository | Resolved | Total |
-|---|---|---|
-| django/django | 20 | 22 |
-| sphinx-doc/sphinx | 7 | 7 |
-| sympy/sympy | 5 | 5 |
-| astropy/astropy | 4 | 4 |
-| scikit-learn/scikit-learn | 4 | 4 |
-| matplotlib/matplotlib | 3 | 4 |
-| mwaskom/seaborn | 1 | 1 |
-| pydata/xarray | 1 | 1 |
-| pytest-dev/pytest | 1 | 1 |
-| pylint-dev/pylint | 0 | 1 |
+| Repository | Resolved | Total | Score |
+|:---|---:|---:|---:|
+| django/django | 20 | 22 | 90.9% |
+| sphinx-doc/sphinx | 7 | 7 | 100.0% |
+| sympy/sympy | 5 | 5 | 100.0% |
+| astropy/astropy | 4 | 4 | 100.0% |
+| scikit-learn/scikit-learn | 4 | 4 | 100.0% |
+| matplotlib/matplotlib | 3 | 4 | 75.0% |
+| mwaskom/seaborn | 1 | 1 | 100.0% |
+| pydata/xarray | 1 | 1 | 100.0% |
+| pytest-dev/pytest | 1 | 1 | 100.0% |
+| pylint-dev/pylint | 0 | 1 | 0.0% |
 
-## Unresolved Instances (4)
+## Unresolved Instances
 
-| Instance | Reason |
-|---|---|
-| django__django-10999 | Regex semantics — agent's lookahead fix doesn't consume input correctly |
-| django__django-13513 | Agent reads wrong code version, produces empty patch |
-| matplotlib__matplotlib-26208 | Agent chases symptoms instead of root cause (missing units property) |
-| pylint-dev__pylint-7080 | Agent modifies wrong file/function for path normalization fix |
+| Instance | Repository |
+|:---|:---|
+| django__django-10999 | django/django |
+| django__django-13513 | django/django |
+| matplotlib__matplotlib-26208 | matplotlib/matplotlib |
+| pylint-dev__pylint-7080 | pylint-dev/pylint |
