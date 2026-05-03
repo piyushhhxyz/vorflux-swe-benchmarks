@@ -4,16 +4,16 @@
   </a>
 </p>
 
-<h1 align="center">Vorflux SWE-Bench Results</h1>
+<h1 align="center">Vorflux Benchmark Results</h1>
 
 <p align="center">
-  <em>Evaluation results for the <a href="https://vorflux.com">Vorflux</a> autonomous software engineering agent on <a href="https://www.swebench.com/">SWE-bench Verified</a></em>
+  <em>Evaluation results for the <a href="https://vorflux.com">Vorflux</a> autonomous software engineering agent on <a href="https://www.swebench.com/">SWE-bench Verified</a> and <a href="https://tbench.ai">Terminal Bench 2</a></em>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/SWE--bench_Verified-83.0%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="SWE-bench Verified 83.0%" />
   &nbsp;
-  <img src="https://img.shields.io/badge/Resolved-83%20of%20100-blue?style=for-the-badge" alt="83 of 100 resolved" />
+  <img src="https://img.shields.io/badge/Terminal_Bench_2-80.0%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="Terminal Bench 2 80.0%" />
   &nbsp;
   <img src="https://img.shields.io/badge/Model-Claude_Sonnet_4-purple?style=for-the-badge" alt="Claude Sonnet 4" />
 </p>
@@ -23,9 +23,9 @@
 ## Highlights
 
 - **83.0% resolve rate** on a 100-instance split from [SWE-bench Verified](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified) (500 instances)
+- **80.0% resolve rate** on 50 tasks from [Terminal Bench 2](https://tbench.ai) (best-ever across experiment runs)
 - **Single attempt per instance** — no retries, no iterative refinement, no per-instance tuning
-- Spans **10 major open-source Python repositories** across web frameworks, scientific computing, visualization, and developer tooling
-- All patches independently verified via the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench)
+- All results independently verified via automated test suites
 
 ---
 
@@ -34,15 +34,20 @@
 | Benchmark | Model | Resolved | Total | Score |
 |:---|:---|---:|---:|---:|
 | [SWE-bench Verified](evaluation/verified/20250427_vorflux_agent_v2/) | Claude Sonnet 4 | **83** | 100 | **83.0%** |
+| [Terminal Bench 2](evaluation/terminal-bench-2/20250430_vorflux_agent_v1/) | Claude Sonnet 4 | **40** | 50 | **80.0%** |
+
+---
+
+## SWE-bench Verified
 
 ### Results by Difficulty
 
 | Difficulty | Resolved | Total | Rate |
 |:---|---:|---:|---:|
-| Easy (&lt;15 min) | 19 | 21 | **90.5%** |
+| Easy (<15 min) | 19 | 21 | **90.5%** |
 | Easy++ (15 min – 1 hr) | 45 | 49 | **91.8%** |
 | Medium (1 – 4 hr) | 18 | 27 | **66.7%** |
-| Hard (&gt;4 hr) | 1 | 3 | **33.3%** |
+| Hard (>4 hr) | 1 | 3 | **33.3%** |
 
 > Difficulty is based on estimated human resolution time from the SWE-bench Verified dataset.
 
@@ -63,12 +68,50 @@
 
 ---
 
+## Terminal Bench 2
+
+### Results by Difficulty
+
+| Difficulty | Resolved | Total | Rate |
+|:---|---:|---:|---:|
+| Easy | 3 | 3 | **100.0%** |
+| Medium | 28 | 29 | **96.6%** |
+| Hard | 9 | 18 | **50.0%** |
+
+### Results by Category
+
+| Category | Resolved | Total | Rate |
+|:---|---:|---:|---:|
+| data-processing | 2 | 2 | 100.0% |
+| debugging | 3 | 3 | 100.0% |
+| file-operations | 4 | 4 | 100.0% |
+| games | 1 | 1 | 100.0% |
+| machine-learning | 2 | 2 | 100.0% |
+| scientific-computing | 3 | 3 | 100.0% |
+| system-administration | 5 | 6 | 83.3% |
+| security | 4 | 5 | 80.0% |
+| data-science | 3 | 4 | 75.0% |
+| model-training | 3 | 4 | 75.0% |
+| mathematics | 2 | 3 | 66.7% |
+| software-engineering | 8 | 12 | 66.7% |
+| data-querying | 0 | 1 | 0.0% |
+
+### Unresolved Tasks Breakdown
+
+Of the 10 unresolved tasks:
+- **5 infrastructure-blocked** — MCP test endpoint times out at 60s (`maxBashTimeout` not deployed to staging). Judge scores of 0.85-1.0 suggest correct solutions that cannot be verified.
+- **5 genuine failures** — agent could not fully solve the task (all hard difficulty)
+
+> See [detailed results](evaluation/terminal-bench-2/20250430_vorflux_agent_v1/) for per-task analysis and session links.
+
+---
+
 ## Methodology
 
 - **Single attempt** per instance — no retries or iterative refinement
 - **Identical configuration and prompt** across all instances — no per-instance tuning
-- Evaluated using the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench)
-- Each generated patch is independently verified against the project's full test suite (fail-to-pass and pass-to-pass)
+- **SWE-bench:** Evaluated using the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench). Each generated patch is independently verified against the project's full test suite (fail-to-pass and pass-to-pass).
+- **Terminal Bench 2:** Each task runs inside a pre-built Docker container. The agent pulls the container, explores the environment, implements the solution, and verifies it. Results are verified by running the benchmark's test suite inside the container via MCP. Best-ever scoring: a task counts as resolved if it passed at least once across all experiment runs.
 
 ---
 
@@ -90,9 +133,16 @@ evaluation/
         results.json                 # Resolved instance list
         resolved_by_repo.json        # Breakdown by repository
       patches/                       # Generated patches (.diff per instance)
+  terminal-bench-2/                  # Terminal Bench 2
+    20250430_vorflux_agent_v1/       # 50-task evaluation (best-ever)
+      metadata.yaml                  # Agent and model configuration
+      README.md                      # Detailed results, methodology, and analysis
+      results/
+        results.json                 # Resolved/unresolved task lists
+        detailed_results.json        # Per-task scores, session URLs, failure reasons
+        results_by_category.json     # Breakdown by task category
+        results_by_difficulty.json   # Breakdown by difficulty level
 ```
-
-Follows the [swe-bench/experiments](https://github.com/swe-bench/experiments) directory convention.
 
 ---
 
