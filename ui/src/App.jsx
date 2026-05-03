@@ -7,6 +7,7 @@ import {
   ShippingLoop,
   TaskAtlas,
   ModelComparison,
+  TopHarnesses,
   RealWorldCTA,
   Footer,
 } from './components/sections';
@@ -23,6 +24,7 @@ export default function App() {
         <ShippingLoop />
         <TaskAtlas />
         <ModelComparison />
+        <TopHarnesses />
         <RealWorldCTA />
       </main>
       <Footer />

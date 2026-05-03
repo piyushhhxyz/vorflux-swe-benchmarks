@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest';
 import {
   BENCHMARKS, HARNESSES, HARNESS_SCORES,
   COMPETITORS, COMPETITOR_SCORES,
-  RAW_MODELS, RAW_BENCHMARK_CATEGORIES, MODEL_SCORES,
-  generateDotGrid,
+  generateDotGrid, TOP_HARNESSES,
+  TERMINAL_BENCH_TASKS, SWE_BENCH_TASKS,
   SHIPPING_LOOP, SUB_AGENTS,
   getRepoUrl, EVAL_DATE,
-  getModelScoreValue, getModelScoreNote,
+  getBestHarnessScore,
 } from './benchmarks';
 
 describe('BENCHMARKS', () => {
@@ -68,6 +68,34 @@ describe('HARNESSES', () => {
   });
 });
 
+describe('TOP_HARNESSES', () => {
+  it('has exactly 3 entries', () => {
+    expect(TOP_HARNESSES).toHaveLength(3);
+  });
+
+  it('is a subset of HARNESSES', () => {
+    for (const th of TOP_HARNESSES) {
+      expect(HARNESSES).toContainEqual(th);
+    }
+  });
+
+  it('contains the actual top 3 SWE-bench performers', () => {
+    const sortedByScore = [...HARNESSES]
+      .sort((a, b) => (HARNESS_SCORES['swe-bench'][b.id] ?? 0) - (HARNESS_SCORES['swe-bench'][a.id] ?? 0));
+    const expectedIds = sortedByScore.slice(0, 3).map((h) => h.id);
+    const actualIds = TOP_HARNESSES.map((h) => h.id);
+    expect(actualIds).toEqual(expectedIds);
+  });
+
+  it('is sorted by SWE-bench score descending', () => {
+    for (let i = 0; i < TOP_HARNESSES.length - 1; i++) {
+      const scoreA = HARNESS_SCORES['swe-bench'][TOP_HARNESSES[i].id];
+      const scoreB = HARNESS_SCORES['swe-bench'][TOP_HARNESSES[i + 1].id];
+      expect(scoreA).toBeGreaterThanOrEqual(scoreB);
+    }
+  });
+});
+
 describe('HARNESS_SCORES', () => {
   it('has entries for both benchmarks with all harness IDs', () => {
     for (const benchKey of ['swe-bench', 'terminal-bench']) {
@@ -96,6 +124,20 @@ describe('HARNESS_SCORES', () => {
         }
       }
     }
+  });
+});
+
+describe('getBestHarnessScore', () => {
+  it('returns highest SWE-bench score', () => {
+    expect(getBestHarnessScore('swe-bench')).toBe(91.0);
+  });
+
+  it('returns highest Terminal-bench score', () => {
+    expect(getBestHarnessScore('terminal-bench')).toBe(86.0);
+  });
+
+  it('returns null for unknown benchmark', () => {
+    expect(getBestHarnessScore('nonexistent')).toBeNull();
   });
 });
 
@@ -139,121 +181,98 @@ describe('COMPETITOR_SCORES', () => {
   });
 });
 
-describe('RAW_MODELS', () => {
-  it('has at least one model', () => {
-    expect(RAW_MODELS.length).toBeGreaterThan(0);
+describe('TERMINAL_BENCH_TASKS', () => {
+  it('has 89 tasks', () => {
+    expect(TERMINAL_BENCH_TASKS).toHaveLength(89);
   });
 
-  it('each model has id and name', () => {
-    for (const m of RAW_MODELS) {
-      expect(m.id).toBeTruthy();
-      expect(m.name).toBeTruthy();
+  it('each task has id, resolved, and difficulty', () => {
+    for (const t of TERMINAL_BENCH_TASKS) {
+      expect(t.id).toBeTruthy();
+      expect(typeof t.resolved).toBe('boolean');
+      expect(['easy', 'medium', 'hard']).toContain(t.difficulty);
     }
   });
 
-  it('exactly one model is flagged as flagship', () => {
-    const flagships = RAW_MODELS.filter((m) => m.flagship);
-    expect(flagships).toHaveLength(1);
+  it('has 67 resolved tasks', () => {
+    expect(TERMINAL_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(67);
   });
 });
 
-describe('RAW_BENCHMARK_CATEGORIES', () => {
-  it('has three benchmark categories', () => {
-    expect(RAW_BENCHMARK_CATEGORIES).toHaveLength(3);
+describe('SWE_BENCH_TASKS', () => {
+  it('has 87 evaluated tasks', () => {
+    expect(SWE_BENCH_TASKS).toHaveLength(87);
   });
 
-  it('each category has key, name, and sub', () => {
-    for (const b of RAW_BENCHMARK_CATEGORIES) {
-      expect(b.key).toBeTruthy();
-      expect(b.name).toBeTruthy();
-      expect(b.sub).toBeTruthy();
-    }
-  });
-});
-
-describe('MODEL_SCORES', () => {
-  it('has entries for all benchmark categories', () => {
-    for (const cat of RAW_BENCHMARK_CATEGORIES) {
-      expect(MODEL_SCORES).toHaveProperty(cat.key);
+  it('each task has id, resolved, and repo', () => {
+    for (const t of SWE_BENCH_TASKS) {
+      expect(t.id).toBeTruthy();
+      expect(typeof t.resolved).toBe('boolean');
+      expect(t.repo).toBeTruthy();
     }
   });
 
-  it('all numeric score values are between 0 and 100', () => {
-    for (const cat of RAW_BENCHMARK_CATEGORIES) {
-      const scores = MODEL_SCORES[cat.key];
-      for (const entry of Object.values(scores)) {
-        const val = getModelScoreValue(entry);
-        if (val != null) {
-          expect(val).toBeGreaterThanOrEqual(0);
-          expect(val).toBeLessThanOrEqual(100);
-        }
-      }
-    }
-  });
-});
-
-describe('getModelScoreValue / getModelScoreNote', () => {
-  it('extracts plain number', () => {
-    expect(getModelScoreValue(75.1)).toBe(75.1);
-    expect(getModelScoreNote(75.1)).toBeNull();
-  });
-
-  it('handles null', () => {
-    expect(getModelScoreValue(null)).toBeNull();
-    expect(getModelScoreNote(null)).toBeNull();
-  });
-
-  it('extracts value and note from object entry', () => {
-    const entry = { value: 75.1, note: 'self-reported harness' };
-    expect(getModelScoreValue(entry)).toBe(75.1);
-    expect(getModelScoreNote(entry)).toBe('self-reported harness');
-  });
-
-  it('returns null note when object has no note field', () => {
-    expect(getModelScoreNote({ value: 50 })).toBeNull();
+  it('has 83 resolved and 4 unresolved tasks', () => {
+    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(83);
+    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(4);
   });
 });
 
 describe('generateDotGrid', () => {
-  it('generates correct number of dots', () => {
-    const dots = generateDotGrid(500, 443);
-    expect(dots).toHaveLength(500);
+  it('generates 87 dots for SWE-bench (evaluated tasks only)', () => {
+    const dots = generateDotGrid('swe-bench');
+    expect(dots).toHaveLength(87);
   });
 
-  it('marks correct number as resolved', () => {
-    const dots = generateDotGrid(500, 443);
-    expect(dots.filter((d) => d.resolved)).toHaveLength(443);
+  it('generates 89 dots for Terminal-bench (evaluated tasks only)', () => {
+    const dots = generateDotGrid('terminal-bench');
+    expect(dots).toHaveLength(89);
   });
 
-  it('unresolved dots have difficulty "miss"', () => {
-    const dots = generateDotGrid(10, 5);
-    const misses = dots.filter((d) => !d.resolved);
-    for (const m of misses) {
-      expect(m.difficulty).toBe('miss');
+  it('dots have actual task IDs', () => {
+    const dots = generateDotGrid('terminal-bench');
+    for (const d of dots) {
+      expect(d.id).toBeTruthy();
+      expect(d.id).not.toMatch(/^placeholder-/);
     }
   });
 
   it('resolved dots have valid difficulty tiers', () => {
-    const dots = generateDotGrid(100, 80);
+    const dots = generateDotGrid('terminal-bench');
     const resolved = dots.filter((d) => d.resolved);
-    const validTiers = ['easy', 'med', 'hard', 'expert'];
+    const validTiers = ['easy', 'medium', 'hard'];
     for (const d of resolved) {
       expect(validTiers).toContain(d.difficulty);
     }
   });
 
-  it('is deterministic across calls', () => {
-    const a = generateDotGrid(50, 30);
-    const b = generateDotGrid(50, 30);
-    for (let i = 0; i < 50; i++) {
-      expect(a[i].difficulty).toBe(b[i].difficulty);
+  it('unresolved dots have difficulty "miss"', () => {
+    const dots = generateDotGrid('terminal-bench');
+    const missed = dots.filter((d) => !d.resolved);
+    for (const d of missed) {
+      expect(d.difficulty).toBe('miss');
     }
   });
 
-  it('handles zero resolved', () => {
-    const dots = generateDotGrid(10, 0);
-    expect(dots.filter((d) => d.resolved)).toHaveLength(0);
-    expect(dots.every((d) => d.difficulty === 'miss')).toBe(true);
+  it('is deterministic across calls', () => {
+    const a = generateDotGrid('swe-bench');
+    const b = generateDotGrid('swe-bench');
+    for (let i = 0; i < a.length; i++) {
+      expect(a[i].id).toBe(b[i].id);
+      expect(a[i].resolved).toBe(b[i].resolved);
+    }
+  });
+
+  it('dots are shuffled (not in original alphabetical order)', () => {
+    const dots = generateDotGrid('terminal-bench');
+    const ids = dots.map((d) => d.id);
+    const sortedIds = [...ids].sort();
+    expect(ids).not.toEqual(sortedIds);
+  });
+
+  it('returns empty array for unknown benchmark', () => {
+    const dots = generateDotGrid('nonexistent');
+    expect(dots).toHaveLength(0);
   });
 });
 

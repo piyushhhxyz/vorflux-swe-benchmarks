@@ -5,6 +5,7 @@ export { default as HarnessPicker } from './HarnessPicker';
 export { default as ShippingLoop } from './ShippingLoop';
 export { default as TaskAtlas } from './TaskAtlas';
 export { default as ModelComparison } from './ModelComparison';
+export { default as TopHarnesses } from './TopHarnesses';
 export { default as RealWorldCTA } from './RealWorldCTA';
 export { default as Footer } from './Footer';
 export { default as SectionHeader } from './SectionHeader';
