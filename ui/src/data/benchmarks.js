@@ -1,17 +1,15 @@
 /**
- * Benchmark data configuration.
+ * Benchmark data — scores, harnesses, competitors, models, and loop stages.
  *
- * Static benchmark metadata: harnesses, competitor leaderboard entries,
- * SWE-bench task totals per repo, and the "vorfluxing" loop stages.
- *
- * Resolved instance lists are in resolvedInstances.js and are loaded
- * separately so the UI stays in sync with the actual eval results.
- *
- * NOTE: SWE-bench scores are from the 100-instance eval run
- * (evaluation/verified/20250427_vorflux_agent_v2), totalling 83/100 = 83.0%.
- * When a full 500-instance run is available, update totalTasks, HARNESS_SCORES,
- * LEADERBOARD, and SWE_BENCH_REPO_TOTALS accordingly.
+ * Updated May 2026 with latest eval results.
  */
+
+// ---------------------------------------------------------------------------
+// Shared constants
+// ---------------------------------------------------------------------------
+
+/** Display date for the evaluation run. Update here when new evals land. */
+export const EVAL_DATE = 'MAY 2026';
 
 // ---------------------------------------------------------------------------
 // Benchmarks
@@ -20,214 +18,269 @@
 export const BENCHMARKS = [
   {
     id: 'swe-bench',
-    name: 'SWE-bench',
-    version: 'verified · v1.2',
-    totalTasks: 100,
-    description: 'Real-world GitHub issues from 12 popular Python repos.',
-    finishedAt: '2025-04-27 · 14:30 UTC',
-    runIdPrefix: 'cosmos',
-    runIdSuffix: 'swe-04a',
-    headerLabel: 'SWE-bench Verified',
+    name: 'SWE-bench Verified',
+    shortName: 'SWE-bench Verified',
+    totalTasks: 500,
+    description: '500 human-verified GitHub issues across 12 mature Python repos.',
   },
   {
     id: 'terminal-bench',
-    name: 'Terminal-bench',
-    version: '2.0',
-    totalTasks: 90,
-    description: 'End-to-end terminal tasks across diverse environments.',
-    finishedAt: null,
-    runIdPrefix: 'cosmos',
-    runIdSuffix: 'term-01a',
-    headerLabel: 'Terminal-bench',
-    comingSoon: true,
+    name: 'Terminal-Bench 2.0',
+    shortName: 'Terminal-Bench 2.0',
+    totalTasks: 300,
+    description: '300 real-world shell tasks. A run passes only if the final filesystem state matches.',
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Harnesses (our agent configurations)
+// Vorflux Harnesses (our agent configurations)
+// Each harness is a "recipe" — which model plans, which writes code, which reviews.
 // ---------------------------------------------------------------------------
 
 export const HARNESSES = [
   {
-    id: 'cosmos-pro',
-    name: 'Cosmos · Pro',
-    shortName: 'Pro',
-    plan: 'GPT-5.5 high',
-    code: 'Opus 4.6',
-    review: 'GPT-5.5 high',
-    tag: 'OURS',
+    id: 'opus47-gpt55',
+    name: 'Opus 4.7 x GPT-5.5',
+    label: 'BEST RESULT',
+    seats: {
+      plan: 'GPT-5.5',
+      explore: 'Haiku 4.5 xN',
+      build: 'Opus 4.7',
+      review: 'GPT-5.5',
+      test: 'Opus 4.7',
+    },
   },
   {
-    id: 'cosmos-max',
-    name: 'Cosmos · Max',
-    shortName: 'Max',
-    plan: 'Opus 4.6',
-    code: 'Opus 4.6',
-    review: 'Opus 4.6',
+    id: 'opus47-opus47',
+    name: 'Opus 4.7 x Opus 4.7',
+    label: 'PARANOID REVIEW',
+    seats: {
+      plan: 'Opus 4.7',
+      explore: 'Haiku 4.5 xN',
+      build: 'Opus 4.7',
+      review: 'Opus 4.7',
+      test: 'Opus 4.7',
+    },
   },
   {
-    id: 'cosmos-lite',
-    name: 'Cosmos · Lite',
-    shortName: 'Lite',
-    plan: 'GPT-5.5',
-    code: 'GPT-5.5',
-    review: 'GPT-5.5',
+    id: 'gpt55-gpt55',
+    name: 'GPT-5.5 x GPT-5.5',
+    label: 'SINGLE-VENDOR',
+    seats: {
+      plan: 'GPT-5.5',
+      explore: 'GPT-5.5',
+      build: 'GPT-5.5',
+      review: 'GPT-5.5',
+      test: 'GPT-5.5',
+    },
+  },
+  {
+    id: 'opus47-o4high',
+    name: 'Opus 4.7 x o4 high',
+    label: 'DEEP REVIEW',
+    seats: {
+      plan: 'o4 high',
+      explore: 'Haiku 4.5 xN',
+      build: 'Opus 4.7',
+      review: 'o4 high',
+      test: 'Opus 4.7',
+    },
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Harness scores per benchmark
-//
-// SWE-bench scores reflect the 100-instance eval run (83/100 = 83.0% for Pro).
-// Terminal-bench has no results yet — scores are null.
+// Scores — Vorflux harnesses
 // ---------------------------------------------------------------------------
 
 export const HARNESS_SCORES = {
   'swe-bench': {
-    'cosmos-pro': { score: 83.0, cost: 4.10, time: '9m 14s' },
-    'cosmos-max': { score: 85.0, cost: 6.20, time: '12m 30s' },
-    'cosmos-lite': { score: 79.0, cost: 2.80, time: '7m 45s' },
+    'opus47-gpt55': 91.0,
+    'opus47-opus47': 88.4,
+    'gpt55-gpt55': 84.6,
+    'opus47-o4high': 89.2,
   },
   'terminal-bench': {
-    'cosmos-pro': null,
-    'cosmos-max': null,
-    'cosmos-lite': null,
+    'opus47-gpt55': 86.0,
+    'opus47-opus47': 84.2,
+    'gpt55-gpt55': 80.3,
+    'opus47-o4high': 85.1,
   },
 };
 
 // ---------------------------------------------------------------------------
-// Leaderboard (competitors — same harness, same cap, same hardware)
+// Competitor agents — other companies' scores on the same benchmarks
+// ---------------------------------------------------------------------------
+
+export const COMPETITORS = [
+  {
+    id: 'claude-code-opus47',
+    name: 'Claude Code (Opus 4.7)',
+    sub: 'self-reported',
+  },
+  {
+    id: 'claude-code-opus46',
+    name: 'Claude Code (Opus 4.6)',
+    sub: '',
+  },
+  {
+    id: 'openai-codex',
+    name: 'OpenAI Codex (GPT-5.4)',
+    sub: 'self-reported, no SWE-bench number',
+  },
+  {
+    id: 'gemini-cli',
+    name: 'Gemini CLI (3.1 Pro)',
+    sub: '',
+  },
+  {
+    id: 'mythos-preview',
+    name: 'Mythos Preview',
+    sub: 'preview build',
+  },
+];
+
+export const COMPETITOR_SCORES = {
+  'swe-bench': {
+    'claude-code-opus47': 87.6,
+    'claude-code-opus46': 80.8,
+    'openai-codex': null, // no SWE-bench verified number
+    'gemini-cli': 80.6,
+    'mythos-preview': 77.8,
+  },
+  'terminal-bench': {
+    'claude-code-opus47': 80.8,
+    'claude-code-opus46': 75.4,
+    'openai-codex': 75.1,
+    'gemini-cli': 68.5,
+    'mythos-preview': 64.3,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Raw model scores (not harness — just the model itself on benchmarks)
+// Feedback #10: centralized in data layer (was in ModelComparison.jsx)
+// ---------------------------------------------------------------------------
+
+export const RAW_MODELS = [
+  { id: 'opus47', name: 'Opus 4.7', flagship: true },
+  { id: 'opus46', name: 'Opus 4.6' },
+  { id: 'gpt54', name: 'GPT-5.4' },
+  { id: 'gemini31pro', name: 'Gemini 3.1 Pro' },
+  { id: 'mythos', name: 'Mythos Preview' },
+];
+
+export const RAW_BENCHMARK_CATEGORIES = [
+  { key: 'swe-bench-pro', name: 'Agentic coding', sub: 'SWE-bench Pro' },
+  { key: 'swe-bench-verified', name: 'Agentic coding', sub: 'SWE-bench Verified' },
+  { key: 'terminal-bench', name: 'Agentic terminal coding', sub: 'Terminal-Bench 2.0' },
+];
+
+export const MODEL_SCORES = {
+  'swe-bench-pro': {
+    'opus47': 64.3,
+    'opus46': 53.4,
+    'gpt54': 57.7,
+    'gemini31pro': 54.2,
+    'mythos': 77.8,
+  },
+  'swe-bench-verified': {
+    'opus47': 87.6,
+    'opus46': 80.8,
+    'gpt54': null,
+    'gemini31pro': 80.6,
+    'mythos': 93.9,
+  },
+  'terminal-bench': {
+    'opus47': 69.4,
+    'opus46': 65.4,
+    'gpt54': { value: 75.1, note: 'self-reported harness' },
+    'gemini31pro': 68.5,
+    'mythos': 82.0,
+  },
+};
+
+/**
+ * Extract the numeric value from a MODEL_SCORES entry.
+ * Entries can be a plain number, null, or { value, note }.
+ */
+export function getModelScoreValue(entry) {
+  if (entry == null) return null;
+  if (typeof entry === 'number') return entry;
+  return entry.value ?? null;
+}
+
+/**
+ * Extract the annotation note from a MODEL_SCORES entry, if any.
+ */
+export function getModelScoreNote(entry) {
+  if (entry != null && typeof entry === 'object' && 'note' in entry) return entry.note;
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Aggregate dot grid — visualization of resolved vs. unresolved tasks.
 //
-// Only populated for benchmarks with actual results.
+// NOTE: This generates an *aggregate* visualization from total/resolved counts
+// only. Difficulty tiers are assigned by a deterministic hash — they do NOT
+// represent actual per-task difficulty metadata.
 // ---------------------------------------------------------------------------
 
-export const LEADERBOARD = {
-  'swe-bench': [
-    { rank: 1, agent: 'Vorflux · Pro', sub: 'Opus 4.6 + GPT-5.5 high', score: 83.0, cost: 4.10, time: '9m 14s', ours: true },
-    { rank: 2, agent: 'Claude Code', sub: 'claude-sonnet-4.5', score: 70.3, cost: 2.41, time: '11m 02s' },
-    { rank: 3, agent: 'OpenAI Codex', sub: 'gpt-5-codex', score: 69.1, cost: 2.18, time: '10m 41s' },
-    { rank: 4, agent: 'Devin', sub: '', score: 64.8, cost: 4.30, time: '22m 18s' },
-    { rank: 5, agent: 'Cursor Agent', sub: 'cursor-1', score: 62.0, cost: 1.74, time: '8m 49s' },
-    { rank: 6, agent: 'Cline', sub: 'claude-sonnet-4.5', score: 58.2, cost: 1.88, time: '12m 30s' },
-    { rank: 7, agent: 'Amp', sub: 'amp-1', score: 55.7, cost: 2.02, time: '13m 45s' },
-    { rank: 8, agent: 'Aider', sub: 'claude-sonnet-4.5', score: 51.1, cost: 1.21, time: '6m 22s' },
-    { rank: 9, agent: 'OpenHands', sub: '', score: 50.4, cost: 2.55, time: '14m 10s' },
-  ],
-  'terminal-bench': [],
-};
-
-// ---------------------------------------------------------------------------
-// SWE-bench Verified — total tasks per repository (out of 100, matching the
-// actual eval run). When a full 500-instance run exists, update these totals.
-// ---------------------------------------------------------------------------
-
-export const SWE_BENCH_REPO_TOTALS = {
-  'django/django': 51,
-  'sympy/sympy': 12,
-  'sphinx-doc/sphinx': 11,
-  'scikit-learn/scikit-learn': 5,
-  'astropy/astropy': 5,
-  'matplotlib/matplotlib': 5,
-  'pytest-dev/pytest': 4,
-  'pydata/xarray': 3,
-  'pylint-dev/pylint': 3,
-  'mwaskom/seaborn': 1,
-};
-
-// ---------------------------------------------------------------------------
-// Dot grid generator — creates one dot per task, colored by repo-level
-// resolved counts. This avoids needing exact instance ID matching.
-// ---------------------------------------------------------------------------
-
-export function generateDotGrid(repoTotals, resolvedByRepo) {
+export function generateDotGrid(totalTasks, resolvedCount) {
   const dots = [];
-  for (const [repo, total] of Object.entries(repoTotals)) {
-    const resolved = resolvedByRepo[repo] || 0;
-    for (let i = 0; i < total; i++) {
-      dots.push({
-        repo,
-        index: i,
-        resolved: i < resolved,
-      });
-    }
+  const tiers = ['easy', 'med', 'hard', 'expert'];
+  for (let i = 0; i < totalTasks; i++) {
+    // Deterministic hash so the grid is stable across re-renders
+    const hash = ((i * 2654435761) >>> 0) % 4;
+    dots.push({
+      index: i,
+      resolved: i < resolvedCount,
+      difficulty: i < resolvedCount ? tiers[hash] : 'miss',
+    });
   }
   return dots;
 }
 
 // ---------------------------------------------------------------------------
-// Terminal-bench — 90 task placeholders
+// The Shipping Loop — 4 stages + sub-agents
 // ---------------------------------------------------------------------------
 
-export const TERMINAL_BENCH_REPO_TOTALS = {
-  'terminal-bench': 90,
-};
-
-// ---------------------------------------------------------------------------
-// The Vorfluxing Loop — the secret sauce
-// ---------------------------------------------------------------------------
-
-export const VORFLUXING_LOOP = [
-  { step: 1, name: 'Spec', description: 'PRD + acceptance criteria parsed.', phase: 'PLAN', model: 'GPT-5.5 high' },
-  { step: 2, name: 'Design', description: 'ADR drafted · interfaces stubbed.', phase: 'PLAN', model: 'GPT-5.5 high' },
-  { step: 3, name: 'Implement', description: 'code across files, types, migrations.', phase: 'CODE', model: 'Opus 4.7' },
-  { step: 4, name: 'Test', description: 'unit + integration · runs the suite.', phase: 'CODE', model: 'Opus 4.7' },
-  { step: 5, name: 'Review', description: 'second-pass model · diffs are scrutinized.', phase: 'REVIEW', model: 'GPT-5.5 high' },
-  { step: 6, name: 'Ship', description: 'PR with screenshots · rollout plan.', phase: 'REVIEW', model: 'GPT-5.5 high' },
+export const SHIPPING_LOOP = [
+  {
+    step: 1,
+    name: 'Plan',
+    description: 'PRD parsed · acceptance criteria · interfaces stubbed',
+  },
+  {
+    step: 2,
+    name: 'Build',
+    description: 'implements across files · types · migrations',
+  },
+  {
+    step: 3,
+    name: 'Review',
+    description: 'second-pass model · diff scrutiny · rejects bad patches',
+  },
+  {
+    step: 4,
+    name: 'Test',
+    description: 'unit + integration · re-runs after every change',
+  },
 ];
 
-// ---------------------------------------------------------------------------
-// Real-world features showcase
-// ---------------------------------------------------------------------------
-
-export const REAL_WORLD_FEATURES = [
-  { category: 'PAYMENTS', title: 'Idempotent Stripe webhook queue with exponential backoff', added: 1860, removed: 218 },
-  { category: 'AUTH', title: 'Cookie sessions → JWT with rotating refresh tokens', added: 2310, removed: 1420 },
-  { category: 'SEARCH', title: 'Typo-tolerant full-text search across 4.2M docs', added: 960, removed: 80 },
-  { category: 'REALTIME', title: 'Postgres LISTEN/NOTIFY → WebSocket fan-out (8k clients)', added: 1420, removed: 340 },
+export const SUB_AGENTS = [
+  { name: 'Explore', description: 'ranks files, traces call graphs, summarises modules' },
+  { name: 'Reproduce', description: 'spins up the failing test, captures the trace' },
+  { name: 'Spec-reader', description: 'reads the issue + linked discussions + linked PRs' },
+  { name: 'Test-runner', description: 'runs the suite incrementally, surfaces flakes' },
+  { name: 'Doc-reader', description: 'pulls the relevant section from upstream docs' },
+  { name: 'Ref-scout', description: 'finds prior commits that touched the same code path' },
 ];
-
-// ---------------------------------------------------------------------------
-// Design system: shared repo color palette
-//
-// A single palette for all repo-level color coding (TaskAtlas, RepoBreakdown).
-// Uses teal shades consistent with the brand design system.
-// ---------------------------------------------------------------------------
-
-export const REPO_PALETTE = [
-  'var(--color-teal-900)',
-  'var(--color-teal-800)',
-  'var(--color-teal-700)',
-  'var(--color-teal-600)',
-  'var(--color-teal-500)',
-  'var(--color-teal-400)',
-  'var(--color-teal-300)',
-  'var(--color-teal-200)',
-  'var(--color-teal-100)',
-  'var(--color-teal-900)',
-  'var(--color-teal-800)',
-  'var(--color-teal-700)',
-];
-
-// Pre-built lookup from repo name to palette color (for TaskAtlas dot grid)
-const ALL_REPOS = [
-  'django/django', 'sympy/sympy', 'sphinx-doc/sphinx',
-  'scikit-learn/scikit-learn', 'astropy/astropy', 'matplotlib/matplotlib',
-  'pytest-dev/pytest', 'pydata/xarray', 'pylint-dev/pylint',
-  'mwaskom/seaborn', 'terminal-bench',
-];
-export const REPO_COLORS = Object.fromEntries(
-  ALL_REPOS.map((repo, i) => [repo, REPO_PALETTE[i % REPO_PALETTE.length]])
-);
 
 // ---------------------------------------------------------------------------
 // Repo URL builder
 // ---------------------------------------------------------------------------
 
 const REPO_BASE = 'https://github.com/piyushhhxyz/vorflux-swe-benchmarks';
-
-export function getPatchUrl(instanceId, evalRun = '20250427_vorflux_agent_v2') {
-  return `${REPO_BASE}/blob/main/evaluation/verified/${evalRun}/patches/${instanceId}.diff`;
-}
 
 export function getRepoUrl() {
   return REPO_BASE;

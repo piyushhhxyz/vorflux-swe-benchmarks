@@ -1,77 +1,114 @@
-import { useMemo } from 'react';
-import { SectionLabel } from '../ui';
-import { getPatchUrl, REPO_COLORS } from '../../data/benchmarks';
-import { RESOLVED_SWE_BENCH } from '../../data/resolvedInstances';
+/**
+ * Dot grid — aggregate visualization of resolved vs. unresolved tasks.
+ * Big grid with difficulty-shaded dots, benchmark toggle, and stats.
+ */
+import { useState, useMemo } from 'react';
+import { BENCHMARKS, HARNESS_SCORES, generateDotGrid } from '../../data/benchmarks';
+import SectionHeader from './SectionHeader';
 
-export default function TaskAtlas({ dotGrid, stats, activeBenchmark }) {
-  // Build lookup: repo -> list of resolved instance IDs (for linking)
-  // Only applicable to swe-bench; terminal-bench has no instance-level data yet.
-  const resolvedByRepo = useMemo(() => {
-    if (activeBenchmark !== 'swe-bench') return {};
-    const map = {};
-    for (const id of RESOLVED_SWE_BENCH) {
-      // "django__django-10554" -> "django/django"
-      const match = id.match(/^(.+?)__(.+?)-\d+$/);
-      if (match) {
-        const repo = `${match[1]}/${match[2]}`;
-        if (!map[repo]) map[repo] = [];
-        map[repo].push(id);
-      }
-    }
-    return map;
-  }, [activeBenchmark]);
+const DIFFICULTY_COLORS = {
+  easy: 'var(--color-teal-200)',
+  med: 'var(--color-teal-400)',
+  hard: 'var(--color-teal-700)',
+  expert: 'var(--color-teal-900)',
+  miss: 'var(--color-slate-200)',
+};
 
-  const cols = activeBenchmark === 'terminal-bench' ? 15 : 25;
+const DIFFICULTY_LABELS = ['easy', 'med', 'hard', 'expert', 'miss'];
+
+export default function TaskAtlas() {
+  const [activeBench, setActiveBench] = useState('swe-bench');
+
+  const benchmark = BENCHMARKS.find((b) => b.id === activeBench) || BENCHMARKS[0];
+
+  // Best harness score for this benchmark
+  const bestScore = Math.max(...Object.values(HARNESS_SCORES[activeBench]));
+  const resolvedCount = Math.round((bestScore / 100) * benchmark.totalTasks);
+
+  const dots = useMemo(
+    () => generateDotGrid(benchmark.totalTasks, resolvedCount),
+    [benchmark.totalTasks, resolvedCount],
+  );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <SectionLabel>TASK ATLAS · {dotGrid.length} DOTS</SectionLabel>
-        <span className="text-[10px] font-mono text-[var(--color-slate-400)]">click any dot</span>
+    <section className="py-20 bg-[var(--color-bg-section)]">
+      <div className="section-wrapper">
+        {/* Header */}
+        <SectionHeader label="SECTION 04" />
+        <h2
+          className="font-serif text-4xl md:text-5xl font-bold tracking-tight mb-4"
+        >
+          Aggregate results at a glance.
+        </h2>
+        <p className="text-[var(--color-slate-600)] max-w-2xl mb-8">
+          One dot per task. Shading represents approximate difficulty tiers derived
+          from aggregate counts — darker means harder. Empty dots are tasks the best
+          harness did not solve.
+        </p>
+
+        {/* Benchmark toggle */}
+        <div className="flex gap-3 mb-8">
+          {BENCHMARKS.map((b) => (
+            <button
+              key={b.id}
+              onClick={() => setActiveBench(b.id)}
+              className={`bench-toggle ${activeBench === b.id ? 'active' : ''}`}
+            >
+              {b.shortName}
+            </button>
+          ))}
+        </div>
+
+        {/* Grid card */}
+        <div className="card p-6 md:p-8">
+          {/* Stats row */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-baseline gap-6">
+              <div>
+                <p className="text-label text-[var(--color-slate-400)] mb-1">RESOLVED</p>
+                <p className="text-3xl font-bold text-[var(--color-slate-800)]">
+                  {resolvedCount}
+                  <span className="text-lg font-normal text-[var(--color-slate-400)] ml-1">
+                    / {benchmark.totalTasks}
+                  </span>
+                </p>
+              </div>
+              <div>
+                <p className="text-label text-[var(--color-slate-400)] mb-1">SCORE</p>
+                <p className="text-3xl font-bold text-[var(--color-slate-800)]">
+                  {bestScore}%
+                </p>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="hidden md:flex items-center gap-4">
+              <span className="text-label text-[var(--color-slate-400)]">SHADING</span>
+              {DIFFICULTY_LABELS.map((d) => (
+                <div key={d} className="flex items-center gap-1.5">
+                  <span
+                    className="w-3 h-3 rounded-sm"
+                    style={{ backgroundColor: DIFFICULTY_COLORS[d] }}
+                  />
+                  <span className="text-xs text-[var(--color-slate-500)]">{d}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Dot grid */}
+          <div className="flex flex-wrap gap-[3px]">
+            {dots.map((dot) => (
+              <div
+                key={dot.index}
+                className="dot-grid-item"
+                style={{ backgroundColor: DIFFICULTY_COLORS[dot.difficulty] }}
+                title={`Task ${dot.index + 1}: ${dot.difficulty}`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-
-      <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-        {dotGrid.map((dot) => {
-          const color = dot.resolved
-            ? (REPO_COLORS[dot.repo] || 'var(--color-teal-700)')
-            : 'var(--color-slate-200)';
-
-          const repoInstances = resolvedByRepo[dot.repo] || [];
-          const instanceId = dot.resolved && repoInstances[dot.index] ? repoInstances[dot.index] : null;
-
-          return (
-            <div
-              key={`${dot.repo}-${dot.index}`}
-              className="dot-grid-item"
-              style={{ backgroundColor: color }}
-              onClick={() => instanceId && window.open(getPatchUrl(instanceId), '_blank')}
-              title={`${dot.repo}${dot.resolved ? ' (resolved)' : ' (failed)'}`}
-            />
-          );
-        })}
-      </div>
-
-      <div className="flex items-center gap-6 mt-4 text-xs text-[var(--color-slate-500)]">
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-[var(--color-teal-700)]" />
-          <span>Only Cosmos</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-[var(--color-teal-300)]" />
-          <span>Cosmos+others</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-[var(--color-slate-200)]" />
-          <span>Failed</span>
-        </div>
-        <div className="ml-auto text-right">
-          <span className="text-[var(--color-teal-700)] font-semibold font-mono">
-            {stats.resolved} only-Cosmos · {stats.resolved}/{stats.total}
-          </span>
-          <br />
-          <span className="text-[var(--color-teal-700)] font-mono text-[11px]">resolved</span>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }

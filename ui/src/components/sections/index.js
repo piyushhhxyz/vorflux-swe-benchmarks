@@ -1,7 +1,10 @@
-export { default as ScoreCard } from './ScoreCard';
-export { default as Leaderboard } from './Leaderboard';
+export { default as VorfluxingDefinition } from './VorfluxingDefinition';
+export { default as HeroTitle } from './HeroTitle';
+export { default as MarksheetTable } from './MarksheetTable';
+export { default as HarnessPicker } from './HarnessPicker';
+export { default as ShippingLoop } from './ShippingLoop';
 export { default as TaskAtlas } from './TaskAtlas';
-export { default as RepoBreakdown } from './RepoBreakdown';
-export { default as VorfluxingLoop } from './VorfluxingLoop';
+export { default as ModelComparison } from './ModelComparison';
 export { default as RealWorldCTA } from './RealWorldCTA';
 export { default as Footer } from './Footer';
+export { default as SectionHeader } from './SectionHeader';
