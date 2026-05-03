@@ -61,7 +61,7 @@ export default function HarnessPicker() {
             </div>
 
             {/* Seat cards */}
-            <div className="grid grid-cols-5 gap-3 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
               {SEAT_LABELS.map((s) => (
                 <div key={s.key} className="border border-[var(--color-border)] rounded-lg p-3">
                   <p className="text-[10px] font-mono text-[var(--color-slate-400)] mb-1">

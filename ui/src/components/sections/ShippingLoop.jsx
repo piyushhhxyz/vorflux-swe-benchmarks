@@ -25,21 +25,21 @@ export default function ShippingLoop() {
         {/* Right — pipeline + sub-agents */}
         <div className="card p-6 md:p-8">
           {/* Pipeline steps — first-child styling handled by CSS .pipeline-step:first-child */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="grid grid-cols-4 gap-2 sm:flex sm:items-center sm:justify-between mb-4">
             {SHIPPING_LOOP.map((step, i) => (
               <div key={step.step} className="contents">
                 <div className="pipeline-step flex-shrink-0">
                   {String(step.step).padStart(2, '0')}
                 </div>
                 {i < SHIPPING_LOOP.length - 1 && (
-                  <span className="text-[var(--color-slate-300)] text-lg mx-2 flex-shrink-0">&rarr;</span>
+                  <span className="hidden sm:inline text-[var(--color-slate-300)] text-lg mx-2 flex-shrink-0">&rarr;</span>
                 )}
               </div>
             ))}
           </div>
 
           {/* Step labels */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {SHIPPING_LOOP.map((step) => (
               <div key={step.step}>
                 <p className="font-bold text-[var(--color-slate-800)] text-lg">{step.name}</p>

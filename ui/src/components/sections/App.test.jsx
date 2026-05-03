@@ -14,6 +14,8 @@ import ModelComparison from './ModelComparison';
 import HeroTitle from './HeroTitle';
 import MarksheetTable from './MarksheetTable';
 import ShippingLoop from './ShippingLoop';
+import VorfluxingDefinition from './VorfluxingDefinition';
+import Footer from './Footer';
 
 afterEach(() => {
   cleanup();
@@ -42,7 +44,7 @@ describe('HeroTitle', () => {
     const { container } = render(<HeroTitle />);
     const heading = container.querySelector('h1');
     expect(heading).toBeInTheDocument();
-    expect(heading.textContent).toMatch(/hardest exams/);
+    expect(heading.textContent).toMatch(/report card/);
   });
 
   it('displays BEST HARNESS label', () => {
@@ -89,7 +91,7 @@ describe('TaskAtlas — interaction', () => {
     const { container } = render(<TaskAtlas />);
     const heading = container.querySelector('h2');
     expect(heading).toBeInTheDocument();
-    expect(heading.textContent).toMatch(/Aggregate results/);
+    expect(heading.textContent).toMatch(/full picture/);
   });
 
   it('shows RESOLVED and SCORE stats', () => {
@@ -170,5 +172,31 @@ describe('ShippingLoop', () => {
     const { container } = render(<ShippingLoop />);
     expect(container.textContent).toContain('Explore');
     expect(container.textContent).toContain('Reproduce');
+  });
+});
+
+describe('VorfluxingDefinition', () => {
+  it('renders the vor·flux·ing text', () => {
+    const { container } = render(<VorfluxingDefinition />);
+    // The middot entities render as the actual character
+    expect(container.textContent).toContain('vor·flux·ing');
+  });
+
+  it('renders the definition blurb', () => {
+    const { container } = render(<VorfluxingDefinition />);
+    expect(container.textContent).toContain('pairing frontier models');
+  });
+});
+
+describe('Footer', () => {
+  it('renders the giant "vorfluxing" text', () => {
+    const { container } = render(<Footer />);
+    expect(container.textContent).toContain('vorfluxing');
+  });
+
+  it('renders copyright text with current year', () => {
+    const { container } = render(<Footer />);
+    const year = new Date().getFullYear().toString();
+    expect(container.textContent).toContain(`© ${year} Vorflux`);
   });
 });
