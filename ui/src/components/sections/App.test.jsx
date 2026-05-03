@@ -1,8 +1,9 @@
 /**
- * Smoke and interaction tests for the redesigned benchmarks page.
+ * Smoke and interaction tests for the benchmarks page.
  *
  * Covers: App render, HarnessPicker tab interaction, TaskAtlas benchmark toggle,
- * SectionHeader reuse, and ModelComparison data-driven annotations.
+ * SectionHeader reuse, ModelComparison agent comparison, TopHarnesses,
+ * VorfluxingDefinition, and Footer.
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
@@ -11,6 +12,7 @@ import HarnessPicker from './HarnessPicker';
 import TaskAtlas from './TaskAtlas';
 import SectionHeader from './SectionHeader';
 import ModelComparison from './ModelComparison';
+import TopHarnesses from './TopHarnesses';
 import HeroTitle from './HeroTitle';
 import MarksheetTable from './MarksheetTable';
 import ShippingLoop from './ShippingLoop';
@@ -40,7 +42,7 @@ describe('App — smoke render', () => {
 });
 
 describe('HeroTitle', () => {
-  it('renders the headline and score cards', () => {
+  it('renders the headline with report card text', () => {
     const { container } = render(<HeroTitle />);
     const heading = container.querySelector('h1');
     expect(heading).toBeInTheDocument();
@@ -77,65 +79,101 @@ describe('HarnessPicker — interaction', () => {
 
   it('switches active harness on tab click', () => {
     render(<HarnessPicker />);
-    // Click the PARANOID REVIEW tab
     const paranoidTab = screen.getAllByText('PARANOID REVIEW')[0];
     fireEvent.click(paranoidTab);
-
-    // The Opus 4.7 x Opus 4.7 harness name should appear
     expect(screen.getAllByText('Opus 4.7 x Opus 4.7').length).toBeGreaterThan(0);
   });
 });
 
 describe('TaskAtlas — interaction', () => {
-  it('renders the aggregate results heading', () => {
+  it('renders the task atlas heading', () => {
     const { container } = render(<TaskAtlas />);
     const heading = container.querySelector('h2');
     expect(heading).toBeInTheDocument();
-    expect(heading.textContent).toMatch(/full picture/);
+    expect(heading.textContent).toMatch(/Task atlas/);
   });
 
-  it('shows RESOLVED and SCORE stats', () => {
+  it('shows EVALUATED and RESOLVED stats', () => {
     const { container } = render(<TaskAtlas />);
+    expect(container.textContent).toContain('EVALUATED');
     expect(container.textContent).toContain('RESOLVED');
-    expect(container.textContent).toContain('SCORE');
   });
 
   it('toggles between benchmarks', () => {
     const { container } = render(<TaskAtlas />);
-    // Default is SWE-bench — should show /500
-    expect(container.textContent).toContain('/ 500');
+    // Default is SWE-bench — should show 87 evaluated tasks
+    expect(container.textContent).toContain('87');
 
     // Click Terminal-Bench toggle
     const termToggle = screen.getByRole('button', { name: /Terminal-Bench/ });
     fireEvent.click(termToggle);
 
-    // Now should show /300
-    expect(container.textContent).toContain('/ 300');
+    // Now should show 89 evaluated tasks
+    expect(container.textContent).toContain('89');
   });
 
-  it('renders dot grid items', () => {
+  it('renders dot grid items for evaluated tasks only', () => {
     const { container } = render(<TaskAtlas />);
     const dots = container.querySelectorAll('.dot-grid-item');
-    expect(dots.length).toBe(500);
+    // SWE-bench: 87 evaluated tasks
+    expect(dots.length).toBe(87);
+  });
+
+  it('renders real task IDs in tooltips', () => {
+    const { container } = render(<TaskAtlas />);
+    const dots = container.querySelectorAll('.dot-grid-item');
+    const titles = Array.from(dots).map((d) => d.getAttribute('title'));
+    // All dots should have real task IDs (no placeholders)
+    expect(titles.every((t) => t && t.includes('·'))).toBe(true);
+    // Check a known task ID appears
+    expect(titles.some((t) => t.includes('django__django'))).toBe(true);
+  });
+
+  it('shows "full benchmark score" annotation under BEST HARNESS', () => {
+    const { container } = render(<TaskAtlas />);
+    expect(container.textContent).toContain('full benchmark score');
   });
 });
 
-describe('ModelComparison — data-driven annotations', () => {
-  it('renders without crashing', () => {
+describe('ModelComparison — agent comparison', () => {
+  it('shows Vorflux as an agent', () => {
     const { container } = render(<ModelComparison />);
-    expect(container).toBeTruthy();
+    expect(container.textContent).toContain('Vorflux');
   });
 
-  it('displays the "self-reported harness" annotation from data', () => {
+  it('shows competitor agents', () => {
     const { container } = render(<ModelComparison />);
-    expect(container.textContent).toContain('self-reported harness');
+    expect(container.textContent).toContain('Claude Code');
+    expect(container.textContent).toContain('Gemini CLI');
+    expect(container.textContent).toContain('Mythos Preview');
   });
 
-  it('renders all model names', () => {
+  it('renders section heading', () => {
     const { container } = render(<ModelComparison />);
-    expect(container.textContent).toContain('Opus 4.7');
-    expect(container.textContent).toContain('GPT-5.4');
-    expect(container.textContent).toContain('Gemini 3.1 Pro');
+    const heading = container.querySelector('h2');
+    expect(heading).toBeInTheDocument();
+    expect(heading.textContent).toMatch(/stacks up/);
+  });
+});
+
+describe('TopHarnesses', () => {
+  it('shows top 3 harness names', () => {
+    const { container } = render(<TopHarnesses />);
+    // Top 3 by SWE-bench score: opus47-gpt55 (91.0), opus47-o4high (89.2), opus47-opus47 (88.4)
+    expect(container.textContent).toContain('Opus 4.7 x GPT-5.5');
+    expect(container.textContent).toContain('Opus 4.7 x o4 high');
+    expect(container.textContent).toContain('Opus 4.7 x Opus 4.7');
+  });
+
+  it('shows BEST badge on first harness', () => {
+    render(<TopHarnesses />);
+    expect(screen.getAllByText('BEST').length).toBeGreaterThan(0);
+  });
+
+  it('renders benchmark scores', () => {
+    const { container } = render(<TopHarnesses />);
+    expect(container.textContent).toContain('91%');
+    expect(container.textContent).toContain('86%');
   });
 });
 
@@ -176,27 +214,37 @@ describe('ShippingLoop', () => {
 });
 
 describe('VorfluxingDefinition', () => {
-  it('renders the vor·flux·ing text', () => {
+  it('renders the word with phonetic pronunciation', () => {
     const { container } = render(<VorfluxingDefinition />);
-    // The middot entities render as the actual character
-    expect(container.textContent).toContain('vor·flux·ing');
+    expect(container.textContent).toContain('vor');
+    expect(container.textContent).toContain('flux');
+    expect(container.textContent).toContain('verb');
+    expect(container.textContent).toContain('gerund');
   });
 
-  it('renders the definition blurb', () => {
+  it('renders the definition text', () => {
     const { container } = render(<VorfluxingDefinition />);
-    expect(container.textContent).toContain('pairing frontier models');
+    expect(container.textContent).toContain('frontier models');
+  });
+
+  it('renders the blockquote usage example', () => {
+    const { container } = render(<VorfluxingDefinition />);
+    const blockquote = container.querySelector('blockquote');
+    expect(blockquote).toBeInTheDocument();
+    expect(blockquote.textContent).toContain('vorfluxing the auth migration');
   });
 });
 
 describe('Footer', () => {
-  it('renders the giant "vorfluxing" text', () => {
+  it('renders start vorfluxing text', () => {
     const { container } = render(<Footer />);
-    expect(container.textContent).toContain('vorfluxing');
+    expect(container.textContent).toContain('start vorfluxing');
   });
 
-  it('renders copyright text with current year', () => {
+  it('renders copyright with current year', () => {
     const { container } = render(<Footer />);
     const year = new Date().getFullYear().toString();
-    expect(container.textContent).toContain(`© ${year} Vorflux`);
+    expect(container.textContent).toContain(year);
+    expect(container.textContent).toContain('Vorflux');
   });
 });
