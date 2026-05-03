@@ -1,53 +1,77 @@
 /**
- * CTA section — $500 in credits offer.
+ * CTA section — $500 credits, lucrative and inviting.
  */
+import VorfluxLogo from '../../assets/VorfluxLogo';
+
 export default function RealWorldCTA() {
   return (
-    <section className="section-wrapper py-20">
+    <section className="section-wrapper py-16 md:py-24">
       <div
-        className="rounded-2xl p-10 md:p-14 text-center"
-        style={{
-          background: 'var(--color-teal-900)',
-          border: '1px solid var(--color-teal-800)',
-        }}
+        className="relative overflow-hidden rounded-3xl p-8 sm:p-12 md:p-16 lg:p-20"
+        style={{ background: 'linear-gradient(135deg, var(--color-teal-900) 0%, var(--color-teal-850) 50%, var(--color-teal-800) 100%)' }}
       >
-        <p className="text-label tracking-widest mb-4" style={{ color: 'var(--color-teal-300)' }}>
-          START VORFLUXING
-        </p>
-        <h2
-          className="font-serif text-3xl md:text-5xl font-bold tracking-tight leading-tight text-white"
-        >
-          $500 in credits for frontier models.
-        </h2>
-        <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: 'var(--color-teal-200)' }}>
-          Opus 4.7, GPT-5.5 High, and every model in between.
-          No rate limits, no waiting lists.
-        </p>
-        <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
-          <a
-            href="https://vorflux.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 font-semibold rounded-lg transition-colors"
-            style={{
-              backgroundColor: 'white',
-              color: 'var(--color-teal-900)',
-            }}
-          >
-            Start vorfluxing &rarr;
-          </a>
-          <a
-            href="https://github.com/piyushhhxyz/vorflux-swe-benchmarks"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 font-semibold rounded-lg transition-colors"
-            style={{
-              border: '1px solid var(--color-teal-400)',
-              color: 'var(--color-teal-200)',
-            }}
-          >
-            View on GitHub
-          </a>
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-10 translate-x-[30%] -translate-y-[30%]"
+          aria-hidden="true"
+          style={{ background: 'radial-gradient(circle, var(--color-teal-400), transparent 70%)' }}
+        />
+        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-10 -translate-x-[20%] translate-y-[20%]"
+          aria-hidden="true"
+          style={{ background: 'radial-gradient(circle, var(--color-teal-300), transparent 70%)' }}
+        />
+
+        <div className="relative z-10">
+          {/* Badge */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15"
+            >
+              <VorfluxLogo size={16} color="white" />
+              <span className="text-label text-white/80 tracking-widest">LIMITED OFFER</span>
+            </div>
+          </div>
+
+          {/* Headline */}
+          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] text-white text-center">
+            $500 free credits.
+          </h2>
+          <p className="mt-3 font-serif text-xl md:text-2xl text-center" style={{ color: 'var(--color-teal-200)' }}>
+            Start vorfluxing today.
+          </p>
+
+          {/* Features */}
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-8 md:mt-10">
+            {['Opus 4.7', 'GPT-5.5 High', 'No rate limits', 'No waiting list'].map((item) => (
+              <span key={item} className="flex items-center gap-2 text-sm md:text-base text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-teal-400)]" />
+                {item}
+              </span>
+            ))}
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 md:mt-12">
+            <a
+              href="https://vorflux.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 text-base font-semibold rounded-xl transition-all hover:scale-[1.02] hover:shadow-lg"
+              style={{ backgroundColor: 'white', color: 'var(--color-teal-900)' }}
+            >
+              Get started free &rarr;
+            </a>
+            <a
+              href="https://github.com/piyushhhxyz/vorflux-swe-benchmarks"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 text-base font-semibold rounded-xl transition-all hover:bg-white/10 border border-white/25 text-white"
+            >
+              View benchmarks
+            </a>
+          </div>
+
+          <p className="text-center text-xs mt-6" style={{ color: 'var(--color-teal-300)' }}>
+            No credit card required &middot; Cancel anytime
+          </p>
         </div>
       </div>
     </section>
