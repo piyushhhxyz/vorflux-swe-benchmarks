@@ -8,11 +8,11 @@ export default function VorfluxingDefinition() {
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 md:gap-16">
         {/* Word + phonetic */}
         <div>
-          <h2 className="font-serif text-4xl font-bold tracking-tight">
+          <h2 className="font-headline text-4xl tracking-tight">
             vor&middot;flux&middot;ing
           </h2>
           <p className="mt-1 text-sm text-[var(--color-slate-500)]">
-            <span className="font-serif italic">
+            <span className="font-serif italic text-[var(--color-slate-600)]">
               /&#x2C8;v&#x254;&#x2D0;r.fl&#x28C;ks.&#x26A;&#x14B;/
             </span>
             {' '}&middot; verb &middot; gerund

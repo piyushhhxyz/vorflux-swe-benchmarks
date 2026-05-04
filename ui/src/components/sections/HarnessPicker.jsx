@@ -25,7 +25,7 @@ export default function HarnessPicker() {
           <div>
             <SectionHeader label="SECTION 02" />
             <h2
-              className="font-serif text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]"
+              className="font-headline text-4xl md:text-5xl tracking-tight leading-[1.05]"
             >
               One agent. Any harness you like.
             </h2>

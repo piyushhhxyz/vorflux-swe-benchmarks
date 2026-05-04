@@ -33,10 +33,10 @@ export default function RealWorldCTA() {
           </div>
 
           {/* Headline */}
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] text-white text-center">
+          <h2 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.95] text-white text-center">
             $500 free credits.
           </h2>
-          <p className="mt-3 font-serif text-xl md:text-2xl text-center" style={{ color: 'var(--color-teal-200)' }}>
+          <p className="mt-3 font-serif italic text-xl md:text-2xl text-center" style={{ color: 'var(--color-teal-200)' }}>
             Ship code 10x faster with your AI super engineer.
           </p>
 

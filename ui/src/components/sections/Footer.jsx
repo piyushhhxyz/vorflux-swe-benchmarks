@@ -8,7 +8,7 @@ export default function Footer() {
       {/* Giant text — full viewport width, no max-width constraint */}
       <div className="select-none pointer-events-none whitespace-nowrap w-full">
         <span
-          className="font-serif font-bold tracking-tighter block leading-[0.85] text-center"
+          className="font-headline tracking-tighter block leading-[0.85] text-center"
           style={{
             fontSize: 'clamp(3rem, 13.5vw, 16rem)',
             color: 'var(--color-teal-100)',

@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://vorflux.com">
-    <img src="https://vorflux-assets-public.s3.us-east-2.amazonaws.com/ui-assets/vorflux-icon.svg" width="80" alt="Vorflux" />
+    <img src="ui/public/vorflux-icon-teal.svg" width="80" alt="Vorflux" />
   </a>
 </p>
 
