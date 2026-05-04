@@ -6,7 +6,7 @@ import SectionHeader from './SectionHeader';
 
 export default function ShippingLoop() {
   return (
-    <section className="section-wrapper py-20">
+    <section className="section-wrapper py-10 md:py-14">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-12 items-start">
         {/* Left — title */}
         <div>

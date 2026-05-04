@@ -27,7 +27,7 @@ export default function HeroTitle() {
   const termScore = HARNESS_SCORES['terminal-bench'][bestHarness.id];
 
   return (
-    <section className="section-wrapper pt-12 md:pt-20 pb-16">
+    <section className="section-wrapper pt-8 md:pt-12 pb-10">
       {/* Newspaper-style top rule + date line */}
       <div className="border-t-2 border-[var(--color-slate-800)] pt-4 mb-8">
         <div className="flex items-center justify-between">

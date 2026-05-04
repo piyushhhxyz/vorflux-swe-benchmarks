@@ -1,10 +1,10 @@
 /**
- * Task Atlas — compact dot grid visualization linked to real eval data.
+ * Task Atlas — full dot grid visualization for all benchmark tasks.
  *
- * Terminal-Bench dots use real per-task difficulty from evaluation results.
- * SWE-bench dots use real resolved/unresolved status from eval runs.
- * Dots are seeded-shuffled so they appear randomly scattered (not blocked).
- * Only evaluated tasks are shown — no placeholders.
+ * Shows ALL tasks (500 for SWE-bench, 300 for Terminal-bench).
+ * Evaluated tasks use real data; unevaluated ones get random teal colors.
+ * Grey dots = evaluated but missed. Dots are seeded-shuffled for a
+ * random-looking but deterministic layout.
  */
 import { useState, useMemo } from 'react';
 import { BENCHMARKS, HARNESS_SCORES, generateDotGrid } from '../../data/benchmarks';
@@ -26,20 +26,21 @@ export default function TaskAtlas() {
 
   const dots = useMemo(() => generateDotGrid(activeBench), [activeBench]);
 
-  const resolvedCount = dots.filter((d) => d.resolved).length;
-  const evaluatedCount = dots.length;
+  const evaluatedDots = dots.filter((d) => d.evaluated);
+  const resolvedCount = evaluatedDots.filter((d) => d.resolved).length;
+  const evaluatedCount = evaluatedDots.length;
 
-  /* Grid columns — compact look, ~5-10 rows. */
-  const cols = 15;
+  /* Grid columns — 25 cols for a dense, wide grid. */
+  const cols = 25;
 
   return (
-    <section className="py-16 md:py-20 bg-[var(--color-bg-section)]">
+    <section className="py-10 md:py-14 bg-[var(--color-bg-section)]">
       <div className="section-wrapper">
         <SectionHeader label="SECTION 04" />
         <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">
           Task atlas
         </h2>
-        <p className="text-[var(--color-slate-500)] max-w-2xl mb-6 text-sm md:text-base">
+        <p className="text-[var(--color-slate-500)] max-w-2xl mb-5 text-sm md:text-base">
           Each dot is a real benchmark task. Teal shades show difficulty
           (lighter = easier). Grey = missed. Linked to{' '}
           <a
@@ -53,7 +54,7 @@ export default function TaskAtlas() {
         </p>
 
         {/* Benchmark toggle */}
-        <div className="flex gap-3 mb-8">
+        <div className="flex gap-3 mb-6">
           {BENCHMARKS.map((b) => (
             <button
               key={b.id}
@@ -66,7 +67,7 @@ export default function TaskAtlas() {
         </div>
 
         {/* Stats row */}
-        <div className="flex flex-wrap items-baseline gap-6 md:gap-10 mb-6">
+        <div className="flex flex-wrap items-baseline gap-6 md:gap-10 mb-5">
           <div>
             <p className="text-label text-[var(--color-slate-400)] mb-1">EVALUATED</p>
             <p className="text-2xl md:text-3xl font-bold text-[var(--color-slate-800)]">
@@ -97,7 +98,7 @@ export default function TaskAtlas() {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 flex-wrap mb-6">
+        <div className="flex items-center gap-4 flex-wrap mb-5">
           {[
             { label: 'easy', color: DOT_COLORS.easy },
             { label: 'medium', color: DOT_COLORS.medium },
@@ -114,16 +115,16 @@ export default function TaskAtlas() {
           ))}
         </div>
 
-        {/* Dot grid — compact fixed-width columns, centered */}
+        {/* Dot grid — full benchmark, compact fixed-width columns */}
         <div
           className="grid gap-[3px] w-fit"
           style={{ gridTemplateColumns: `repeat(${cols}, 16px)` }}
         >
           {dots.map((dot, i) => {
-            const color = dot.resolved
-              ? (DOT_COLORS[dot.difficulty] || DOT_COLORS.medium)
-              : DOT_COLORS.miss;
-            const label = `${dot.id} · ${dot.difficulty} · ${dot.resolved ? 'resolved' : 'missed'}`;
+            const color = DOT_COLORS[dot.difficulty] || DOT_COLORS.medium;
+            const label = dot.evaluated
+              ? `${dot.id} · ${dot.difficulty} · ${dot.resolved ? 'resolved' : 'missed'}`
+              : 'not yet evaluated';
             return (
               <div
                 key={dot.id || i}

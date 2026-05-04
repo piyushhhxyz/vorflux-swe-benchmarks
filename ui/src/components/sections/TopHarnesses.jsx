@@ -10,7 +10,7 @@ import BestBadge from './BestBadge';
 
 export default function TopHarnesses() {
   return (
-    <section className="py-16 md:py-20">
+    <section className="py-10 md:py-14">
       <div className="section-wrapper">
         <SectionHeader label="SECTION 06" />
         <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">

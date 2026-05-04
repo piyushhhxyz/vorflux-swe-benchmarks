@@ -6,7 +6,7 @@ import { HARNESSES, getBestHarnessScore } from '../../data/benchmarks';
 
 export default function RealWorldCTA() {
   return (
-    <section className="section-wrapper py-16 md:py-24">
+    <section className="section-wrapper py-10 md:py-16">
       <div
         className="relative overflow-hidden rounded-3xl p-8 sm:p-12 md:p-16 lg:p-20"
         style={{ background: 'linear-gradient(135deg, var(--color-teal-900) 0%, var(--color-teal-850) 50%, var(--color-teal-800) 100%)' }}

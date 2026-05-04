@@ -112,21 +112,21 @@ describe('TaskAtlas — interaction', () => {
     expect(container.textContent).toContain('89');
   });
 
-  it('renders dot grid items for evaluated tasks only', () => {
+  it('renders dot grid items for all benchmark tasks', () => {
     const { container } = render(<TaskAtlas />);
     const dots = container.querySelectorAll('.dot-grid-item');
-    // SWE-bench: 87 evaluated tasks
-    expect(dots.length).toBe(87);
+    // SWE-bench: 500 total tasks (87 evaluated + 413 placeholders)
+    expect(dots.length).toBe(500);
   });
 
-  it('renders real task IDs in tooltips', () => {
+  it('renders real task IDs in evaluated dot tooltips', () => {
     const { container } = render(<TaskAtlas />);
     const dots = container.querySelectorAll('.dot-grid-item');
     const titles = Array.from(dots).map((d) => d.getAttribute('title'));
-    // All dots should have real task IDs (no placeholders)
-    expect(titles.every((t) => t && t.includes('·'))).toBe(true);
-    // Check a known task ID appears
+    // Check a known evaluated task ID appears
     expect(titles.some((t) => t.includes('django__django'))).toBe(true);
+    // Check placeholder dots have "not yet evaluated" tooltip
+    expect(titles.some((t) => t === 'not yet evaluated')).toBe(true);
   });
 
   it('shows "full benchmark score" annotation under BEST HARNESS', () => {

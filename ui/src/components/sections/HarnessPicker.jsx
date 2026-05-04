@@ -18,7 +18,7 @@ export default function HarnessPicker() {
   const active = HARNESSES[activeIdx];
 
   return (
-    <section className="py-20 bg-[var(--color-bg-section)]">
+    <section className="py-10 md:py-14 bg-[var(--color-bg-section)]">
       <div className="section-wrapper">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-12 items-start">
           {/* Left — title + description */}
