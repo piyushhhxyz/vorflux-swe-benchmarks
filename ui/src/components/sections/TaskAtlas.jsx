@@ -77,20 +77,22 @@ export default function TaskAtlas() {
 
   const allDots = useMemo(() => generateDotGrid(activeBench), [activeBench]);
 
-  // Apply filters
+  // Apply filters — unevaluated placeholder dots always stay visible
+  // as background context; filters only affect evaluated dots.
   const dots = useMemo(() => {
     return allDots.filter((dot) => {
-      // Status filter
-      if (statusFilter === 'Passed' && !(dot.evaluated && dot.resolved)) return false;
-      if (statusFilter === 'Failed' && !(dot.evaluated && !dot.resolved)) return false;
+      // Placeholders always visible
+      if (!dot.evaluated) return true;
 
-      // Difficulty filter (only applies to evaluated dots)
+      // Status filter
+      if (statusFilter === 'Passed' && !dot.resolved) return false;
+      if (statusFilter === 'Failed' && dot.resolved) return false;
+
+      // Difficulty filter
       if (difficultyFilter !== 'All') {
         const filterKey = difficultyFilter.toLowerCase();
-        if (dot.evaluated) {
-          const dotDiff = dot.category || dot.difficulty;
-          if (dotDiff !== filterKey && dot.difficulty !== filterKey) return false;
-        }
+        const dotDiff = dot.category || dot.difficulty;
+        if (dotDiff !== filterKey && dot.difficulty !== filterKey) return false;
       }
 
       return true;
