@@ -219,38 +219,59 @@ describe('SWE_BENCH_TASKS', () => {
 });
 
 describe('generateDotGrid', () => {
-  it('generates 87 dots for SWE-bench (evaluated tasks only)', () => {
+  it('generates 500 dots for SWE-bench (full benchmark)', () => {
     const dots = generateDotGrid('swe-bench');
-    expect(dots).toHaveLength(87);
+    expect(dots).toHaveLength(500);
   });
 
-  it('generates 89 dots for Terminal-bench (evaluated tasks only)', () => {
+  it('generates 300 dots for Terminal-bench (full benchmark)', () => {
     const dots = generateDotGrid('terminal-bench');
-    expect(dots).toHaveLength(89);
+    expect(dots).toHaveLength(300);
   });
 
-  it('dots have actual task IDs', () => {
+  it('has 87 evaluated dots for SWE-bench and 89 for Terminal-bench', () => {
+    const sweDots = generateDotGrid('swe-bench');
+    expect(sweDots.filter((d) => d.evaluated)).toHaveLength(87);
+    const tbDots = generateDotGrid('terminal-bench');
+    expect(tbDots.filter((d) => d.evaluated)).toHaveLength(89);
+  });
+
+  it('evaluated dots have real task IDs, placeholders have placeholder IDs', () => {
     const dots = generateDotGrid('terminal-bench');
-    for (const d of dots) {
-      expect(d.id).toBeTruthy();
+    const evaluated = dots.filter((d) => d.evaluated);
+    const placeholders = dots.filter((d) => !d.evaluated);
+    for (const d of evaluated) {
       expect(d.id).not.toMatch(/^placeholder-/);
+    }
+    for (const d of placeholders) {
+      expect(d.id).toMatch(/^placeholder-/);
     }
   });
 
-  it('resolved dots have valid difficulty tiers', () => {
+  it('resolved evaluated dots have valid difficulty tiers', () => {
     const dots = generateDotGrid('terminal-bench');
-    const resolved = dots.filter((d) => d.resolved);
+    const resolved = dots.filter((d) => d.evaluated && d.resolved);
     const validTiers = ['easy', 'medium', 'hard'];
     for (const d of resolved) {
       expect(validTiers).toContain(d.difficulty);
     }
   });
 
-  it('unresolved dots have difficulty "miss"', () => {
+  it('unresolved evaluated dots have difficulty "miss"', () => {
     const dots = generateDotGrid('terminal-bench');
-    const missed = dots.filter((d) => !d.resolved);
+    const missed = dots.filter((d) => d.evaluated && !d.resolved);
     for (const d of missed) {
       expect(d.difficulty).toBe('miss');
+    }
+  });
+
+  it('placeholder dots have random teal colors (easy/medium/hard)', () => {
+    const dots = generateDotGrid('swe-bench');
+    const placeholders = dots.filter((d) => !d.evaluated);
+    expect(placeholders.length).toBe(500 - 87);
+    const validTiers = ['easy', 'medium', 'hard'];
+    for (const d of placeholders) {
+      expect(validTiers).toContain(d.difficulty);
     }
   });
 
@@ -259,11 +280,11 @@ describe('generateDotGrid', () => {
     const b = generateDotGrid('swe-bench');
     for (let i = 0; i < a.length; i++) {
       expect(a[i].id).toBe(b[i].id);
-      expect(a[i].resolved).toBe(b[i].resolved);
+      expect(a[i].difficulty).toBe(b[i].difficulty);
     }
   });
 
-  it('dots are shuffled (not in original alphabetical order)', () => {
+  it('dots are shuffled (not in original order)', () => {
     const dots = generateDotGrid('terminal-bench');
     const ids = dots.map((d) => d.id);
     const sortedIds = [...ids].sort();

@@ -14,7 +14,7 @@ import BestBadge from './BestBadge';
 
 export default function ModelComparison() {
   return (
-    <section className="py-16 md:py-20">
+    <section className="py-10 md:py-14">
       <div className="section-wrapper">
         <SectionHeader label="SECTION 05" />
         <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">

@@ -22,7 +22,7 @@ export default function MarksheetTable() {
   });
 
   return (
-    <section className="section-wrapper py-16">
+    <section className="section-wrapper py-10 md:py-12">
       <div className="card p-8 md:p-10 overflow-x-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">

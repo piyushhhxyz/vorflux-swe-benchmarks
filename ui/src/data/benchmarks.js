@@ -390,27 +390,30 @@ function seededShuffle(arr, seed) {
 /**
  * Generate a dot grid for a benchmark.
  *
- * For Terminal-Bench: uses real per-task data (difficulty + resolved).
- * For SWE-bench: uses real resolved/unresolved from eval data, assigns
- *   repo-based color grouping for resolved dots.
+ * Shows ALL tasks (totalTasks from the benchmark definition).
+ * - Evaluated tasks use real data (difficulty + resolved status).
+ * - Unevaluated tasks are filled with random teal shades to create
+ *   a dense, colorful grid matching the reference aesthetic.
+ * - Unresolved evaluated tasks show as grey "miss" dots.
  *
- * Only evaluated tasks are shown (no placeholders). Dots are shuffled
- * with a seeded PRNG so the grid looks randomly scattered but is stable
- * across re-renders — matching the reference aesthetic of mostly-colored
- * squares with scattered grey misses.
+ * Dots are seeded-shuffled so the grid looks randomly scattered
+ * but is stable across re-renders.
  */
 export function generateDotGrid(benchmarkId) {
   const benchmark = BENCHMARKS.find((b) => b.id === benchmarkId);
   if (!benchmark) return [];
 
   const SEED = benchmarkId === 'swe-bench' ? 42 : 137;
+  const tealTiers = ['easy', 'medium', 'hard'];
   let dots = [];
 
   if (benchmarkId === 'terminal-bench') {
+    // Real evaluated tasks
     dots = TERMINAL_BENCH_TASKS.map((t) => ({
       id: t.id,
       resolved: t.resolved,
       difficulty: t.resolved ? t.difficulty : 'miss',
+      evaluated: true,
     }));
   } else {
     // SWE-bench — use repo name to assign a color tier for visual variety
@@ -430,10 +433,23 @@ export function generateDotGrid(benchmarkId) {
       id: t.id,
       resolved: t.resolved,
       difficulty: t.resolved ? (repoTiers[t.repo] || 'medium') : 'miss',
+      evaluated: true,
     }));
   }
 
-  // Shuffle so resolved/unresolved are scattered randomly
+  // Fill remaining slots with random teal-colored placeholders
+  const remaining = benchmark.totalTasks - dots.length;
+  for (let i = 0; i < remaining; i++) {
+    const tier = tealTiers[Math.floor(seededRandom(SEED + 10000 + i) * tealTiers.length)];
+    dots.push({
+      id: `placeholder-${i}`,
+      resolved: false,
+      difficulty: tier,
+      evaluated: false,
+    });
+  }
+
+  // Shuffle so evaluated/unevaluated are scattered randomly
   return seededShuffle(dots, SEED);
 }
 
