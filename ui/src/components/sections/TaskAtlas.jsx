@@ -30,8 +30,8 @@ export default function TaskAtlas() {
   const resolvedCount = evaluatedDots.filter((d) => d.resolved).length;
   const evaluatedCount = evaluatedDots.length;
 
-  /* Grid columns — 25 cols for a dense, wide grid. */
-  const cols = 25;
+  /* Grid columns — wider grid for better proportions. */
+  const cols = 30;
 
   return (
     <section className="py-10 md:py-14 bg-[var(--color-bg-section)]">
@@ -115,10 +115,10 @@ export default function TaskAtlas() {
           ))}
         </div>
 
-        {/* Dot grid — full benchmark, compact fixed-width columns */}
+        {/* Dot grid — full-width, dots fill available space */}
         <div
-          className="grid gap-[3px] w-fit"
-          style={{ gridTemplateColumns: `repeat(${cols}, 16px)` }}
+          className="grid gap-[3px]"
+          style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
         >
           {dots.map((dot, i) => {
             const color = DOT_COLORS[dot.difficulty] || DOT_COLORS.medium;
