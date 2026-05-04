@@ -2,7 +2,7 @@
  * Vorflux icon (dot-constellation mark) as an inline SVG component.
  * Sourced from the cosmos codebase — vorflux-icon.svg (latest dots pattern).
  */
-export default function VorfluxLogo({ size = 32, color = '#00747E', className = '' }) {
+export default function VorfluxLogo({ size = 32, color = '#1a1a1a', className = '' }) {
   return (
     <svg
       width={size}
