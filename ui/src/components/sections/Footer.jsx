@@ -10,7 +10,7 @@ export default function Footer() {
         <span
           className="font-serif font-bold tracking-tighter block leading-[0.85] text-center"
           style={{
-            fontSize: 'clamp(3rem, 15.5vw, 18rem)',
+            fontSize: 'clamp(3rem, 13.5vw, 16rem)',
             color: 'var(--color-teal-100)',
           }}
         >
