@@ -362,6 +362,52 @@ export const SWE_BENCH_TASKS = [
 ];
 
 // ---------------------------------------------------------------------------
+// Per-repo color assignments for SWE-bench dot grid legend.
+// Each repo gets a unique teal/green shade for visual distinction.
+// ---------------------------------------------------------------------------
+
+export const REPO_COLORS = {
+  'django/django': '#0d6e6e',
+  'sympy/sympy': '#2aa198',
+  'sphinx-doc/sphinx': '#1a9988',
+  'scikit-learn/scikit-learn': '#0b5351',
+  'matplotlib/matplotlib': '#5fb4a2',
+  'astropy/astropy': '#7ec8b8',
+  'pytest-dev/pytest': '#3d8b7a',
+  'pydata/xarray': '#4aa89a',
+  'mwaskom/seaborn': '#8fd4c4',
+  'pylint-dev/pylint': '#b05060',
+};
+
+/** Compute per-repo stats from SWE_BENCH_TASKS. */
+export function getRepoStats() {
+  const stats = {};
+  for (const t of SWE_BENCH_TASKS) {
+    if (!stats[t.repo]) stats[t.repo] = { resolved: 0, total: 0 };
+    stats[t.repo].total++;
+    if (t.resolved) stats[t.repo].resolved++;
+  }
+  // Sort by total descending
+  return Object.entries(stats)
+    .sort((a, b) => b[1].total - a[1].total)
+    .map(([repo, counts]) => ({ repo, ...counts }));
+}
+
+/** Compute per-category stats from TERMINAL_BENCH_TASKS. */
+export function getCategoryStats() {
+  const stats = {};
+  for (const t of TERMINAL_BENCH_TASKS) {
+    const cat = t.category || t.difficulty;
+    if (!stats[cat]) stats[cat] = { resolved: 0, total: 0 };
+    stats[cat].total++;
+    if (t.resolved) stats[cat].resolved++;
+  }
+  return Object.entries(stats)
+    .sort((a, b) => b[1].total - a[1].total)
+    .map(([category, counts]) => ({ category, ...counts }));
+}
+
+// ---------------------------------------------------------------------------
 // Dot grid generator — uses real task data when available, with
 // seeded-random shuffle so dots look scattered (not blocked).
 // ---------------------------------------------------------------------------
@@ -413,6 +459,7 @@ export function generateDotGrid(benchmarkId) {
       id: t.id,
       resolved: t.resolved,
       difficulty: t.resolved ? t.difficulty : 'miss',
+      category: t.difficulty,
       evaluated: true,
     }));
   } else {
@@ -433,6 +480,7 @@ export function generateDotGrid(benchmarkId) {
       id: t.id,
       resolved: t.resolved,
       difficulty: t.resolved ? (repoTiers[t.repo] || 'medium') : 'miss',
+      repo: t.repo,
       evaluated: true,
     }));
   }
