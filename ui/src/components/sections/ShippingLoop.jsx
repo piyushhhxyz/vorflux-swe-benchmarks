@@ -12,7 +12,7 @@ export default function ShippingLoop() {
         <div>
           <SectionHeader label="SECTION 03" />
           <h2
-            className="font-serif text-4xl md:text-5xl font-bold tracking-tight leading-[1.05]"
+            className="font-headline text-4xl md:text-5xl tracking-tight leading-[1.05]"
           >
             The shipping loop.
           </h2>

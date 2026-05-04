@@ -17,7 +17,7 @@ export default function ModelComparison() {
     <section className="py-10 md:py-14">
       <div className="section-wrapper">
         <SectionHeader label="SECTION 05" />
-        <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">
+        <h2 className="font-headline text-3xl md:text-4xl lg:text-5xl tracking-tight mb-3">
           How Vorflux stacks up.
         </h2>
         <p className="text-[var(--color-slate-500)] max-w-2xl mb-10 text-sm md:text-base">

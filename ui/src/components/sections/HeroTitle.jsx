@@ -28,8 +28,8 @@ export default function HeroTitle() {
 
   return (
     <section className="section-wrapper pt-6 md:pt-8 pb-8">
-      {/* Newspaper-style top rule + date line */}
-      <div className="border-t-2 border-[var(--color-slate-800)] pt-3 mb-6">
+      {/* Section label + date line */}
+      <div className="pt-1 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[var(--color-teal-600)]" />
@@ -43,7 +43,7 @@ export default function HeroTitle() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 lg:gap-12 items-start">
         {/* Left: Headline + subtitle */}
         <div>
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95]">
+          <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.95]">
             Vorflux&rsquo;s report card across{' '}
             <span className="text-[var(--color-teal-700)]">industry benchmarks.</span>
           </h1>

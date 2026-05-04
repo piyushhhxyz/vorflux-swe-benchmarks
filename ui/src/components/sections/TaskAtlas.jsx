@@ -124,7 +124,7 @@ export default function TaskAtlas() {
     <section className="py-10 md:py-14 bg-[var(--color-bg-section)]">
       <div className="section-wrapper">
         <SectionHeader label="SECTION 04" />
-        <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3">
+        <h2 className="font-headline text-3xl md:text-4xl lg:text-5xl tracking-tight mb-3">
           Task atlas
         </h2>
         <p className="text-[var(--color-slate-500)] max-w-2xl mb-5 text-sm md:text-base">
