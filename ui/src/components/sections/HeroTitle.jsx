@@ -1,5 +1,5 @@
 /**
- * Hero section — report card / newspaper style headline + two score cards.
+ * Hero section — report card / newspaper style headline + two score cards side-by-side.
  */
 import { BENCHMARKS, HARNESSES, HARNESS_SCORES, EVAL_DATE } from '../../data/benchmarks';
 
@@ -27,9 +27,9 @@ export default function HeroTitle() {
   const termScore = HARNESS_SCORES['terminal-bench'][bestHarness.id];
 
   return (
-    <section className="section-wrapper pt-8 md:pt-12 pb-10">
+    <section className="section-wrapper pt-6 md:pt-8 pb-8">
       {/* Newspaper-style top rule + date line */}
-      <div className="border-t-2 border-[var(--color-slate-800)] pt-4 mb-8">
+      <div className="border-t-2 border-[var(--color-slate-800)] pt-3 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[var(--color-teal-600)]" />
@@ -39,24 +39,28 @@ export default function HeroTitle() {
         </div>
       </div>
 
-      {/* Headline */}
-      <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] max-w-5xl">
-        Vorflux&rsquo;s report card across{' '}
-        <span className="text-[var(--color-teal-700)]">industry benchmarks.</span>
-      </h1>
+      {/* Side-by-side: Headline left, Score cards right */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 lg:gap-12 items-start">
+        {/* Left: Headline + subtitle */}
+        <div>
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95]">
+            Vorflux&rsquo;s report card across{' '}
+            <span className="text-[var(--color-teal-700)]">industry benchmarks.</span>
+          </h1>
 
-      {/* Subtitle — newspaper lede style */}
-      <div className="border-t border-[var(--color-border)] mt-8 pt-6">
-        <p className="text-base md:text-lg text-[var(--color-slate-600)] max-w-2xl leading-relaxed">
-          Two public benchmarks. Four harness recipes. Every run, every patch,
-          every trajectory — open in the repo. No selection, no cherry-picks.
-        </p>
-      </div>
+          <div className="border-t border-[var(--color-border)] mt-6 pt-4">
+            <p className="text-base md:text-lg text-[var(--color-slate-600)] max-w-xl leading-relaxed">
+              Two public benchmarks. Four harness recipes. Every run, every patch,
+              every trajectory — open in the repo. No selection, no cherry-picks.
+            </p>
+          </div>
+        </div>
 
-      {/* Two big score cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-10 md:mt-14">
-        <ScoreHero benchmark={sweBench} score={sweScore} harness={bestHarness} />
-        <ScoreHero benchmark={termBench} score={termScore} harness={bestHarness} />
+        {/* Right: Two score cards stacked */}
+        <div className="flex flex-col gap-4 lg:w-[340px]">
+          <ScoreHero benchmark={sweBench} score={sweScore} harness={bestHarness} />
+          <ScoreHero benchmark={termBench} score={termScore} harness={bestHarness} />
+        </div>
       </div>
     </section>
   );
@@ -64,8 +68,8 @@ export default function HeroTitle() {
 
 function ScoreHero({ benchmark, score, harness }) {
   return (
-    <div className="card p-6 md:p-8">
-      <p className="text-label text-[var(--color-slate-500)] mb-4 md:mb-6">
+    <div className="card p-5">
+      <p className="text-label text-[var(--color-slate-500)] mb-3">
         {benchmark.shortName.toUpperCase()} &middot; {benchmark.totalTasks} TASKS
       </p>
 
@@ -81,7 +85,7 @@ function ScoreHero({ benchmark, score, harness }) {
         </div>
       </div>
 
-      <p className="mt-4 md:mt-6 text-sm text-[var(--color-slate-500)]">
+      <p className="mt-3 text-sm text-[var(--color-slate-500)]">
         {benchmark.description}
       </p>
     </div>

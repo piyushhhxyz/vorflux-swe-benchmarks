@@ -265,14 +265,19 @@ describe('generateDotGrid', () => {
     }
   });
 
-  it('placeholder dots have random teal colors (easy/medium/hard)', () => {
+  it('placeholder dots are a mix of teal colors and empty', () => {
     const dots = generateDotGrid('swe-bench');
     const placeholders = dots.filter((d) => !d.evaluated);
     expect(placeholders.length).toBe(500 - 87);
-    const validTiers = ['easy', 'medium', 'hard'];
+    const validTiers = ['easy', 'medium', 'hard', 'empty'];
     for (const d of placeholders) {
       expect(validTiers).toContain(d.difficulty);
     }
+    // Should have both colored and empty placeholders
+    const colored = placeholders.filter((d) => d.difficulty !== 'empty');
+    const empty = placeholders.filter((d) => d.difficulty === 'empty');
+    expect(colored.length).toBeGreaterThan(0);
+    expect(empty.length).toBeGreaterThan(0);
   });
 
   it('is deterministic across calls', () => {

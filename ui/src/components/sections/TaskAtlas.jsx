@@ -22,6 +22,7 @@ const DOT_COLORS = {
   medium: 'var(--color-teal-400)',
   hard: 'var(--color-teal-700)',
   miss: 'var(--color-slate-300)',
+  empty: '#f0eeeb',
 };
 
 /** Difficulty filter options. */
@@ -109,8 +110,8 @@ export default function TaskAtlas() {
 
   const highlights = activeBench === 'swe-bench' ? SWE_HIGHLIGHTS : TB_HIGHLIGHTS;
 
-  /* Grid columns — wider grid for better proportions. */
-  const cols = 30;
+  /* Grid columns — wide enough to fit the grid in one viewport section. */
+  const cols = 50;
 
   // Reset filters when switching benchmarks
   const handleBenchSwitch = (benchId) => {

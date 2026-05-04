@@ -4,7 +4,7 @@
  */
 export default function VorfluxingDefinition() {
   return (
-    <section className="section-wrapper py-8 md:py-10 border-b border-[var(--color-border)]">
+    <section className="section-wrapper py-5 md:py-6 border-b border-[var(--color-border)]">
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 md:gap-16">
         {/* Word + phonetic */}
         <div>

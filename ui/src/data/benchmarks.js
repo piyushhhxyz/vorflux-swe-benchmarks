@@ -485,10 +485,15 @@ export function generateDotGrid(benchmarkId) {
     }));
   }
 
-  // Fill remaining slots with random teal-colored placeholders
+  // Fill remaining slots — mix of teal-colored and white/empty placeholders.
+  // ~40% get random teal shades, ~60% stay white to show they're unevaluated.
   const remaining = benchmark.totalTasks - dots.length;
   for (let i = 0; i < remaining; i++) {
-    const tier = tealTiers[Math.floor(seededRandom(SEED + 10000 + i) * tealTiers.length)];
+    const rand = seededRandom(SEED + 10000 + i);
+    const isColored = rand < 0.4;
+    const tier = isColored
+      ? tealTiers[Math.floor(seededRandom(SEED + 20000 + i) * tealTiers.length)]
+      : 'empty';
     dots.push({
       id: `placeholder-${i}`,
       resolved: false,
