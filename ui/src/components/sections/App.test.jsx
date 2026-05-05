@@ -71,16 +71,13 @@ describe('SectionHeader', () => {
 describe('HarnessPicker — interaction', () => {
   it('renders all four harness tabs', () => {
     render(<HarnessPicker />);
-    expect(screen.getAllByText('CURRENT BEST').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('PARANOID REVIEW').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('SINGLE-VENDOR').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('NEXT').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('BEST').length).toBeGreaterThan(0);
   });
 
   it('switches active harness on tab click', () => {
     render(<HarnessPicker />);
-    const paranoidTab = screen.getAllByText('PARANOID REVIEW')[0];
-    fireEvent.click(paranoidTab);
+    const tab = screen.getAllByText('Opus 4.7 x Opus 4.7')[0];
+    fireEvent.click(tab);
     expect(screen.getAllByText('Opus 4.7 x Opus 4.7').length).toBeGreaterThan(0);
   });
 });
@@ -101,8 +98,8 @@ describe('TaskAtlas — interaction', () => {
 
   it('toggles between benchmarks', () => {
     const { container } = render(<TaskAtlas />);
-    // Default is SWE-bench — should show 489 evaluated tasks
-    expect(container.textContent).toContain('489');
+    // Default is SWE-bench — should show 500 evaluated tasks
+    expect(container.textContent).toContain('500');
 
     // Click Terminal-Bench toggle
     const termToggle = screen.getByRole('button', { name: /Terminal-Bench/ });
@@ -125,8 +122,8 @@ describe('TaskAtlas — interaction', () => {
     const titles = Array.from(dots).map((d) => d.getAttribute('title'));
     // Check a known evaluated task ID appears
     expect(titles.some((t) => t.includes('django__django'))).toBe(true);
-    // Check placeholder dots have "not yet evaluated" tooltip
-    expect(titles.some((t) => t === 'not yet evaluated')).toBe(true);
+    // All 500 are now evaluated — no placeholder dots expected
+    expect(titles.filter((t) => t === 'not yet evaluated')).toHaveLength(0);
   });
 
   it('shows "full benchmark score" annotation under BEST HARNESS', () => {
@@ -159,9 +156,9 @@ describe('ModelComparison — agent comparison', () => {
 describe('TopHarnesses', () => {
   it('shows top 3 harness names', () => {
     const { container } = render(<TopHarnesses />);
-    // Top 3 by SWE-bench score: opus46-gpt55h (84.5), others null
-    expect(container.textContent).toContain('Opus 4.6 x GPT-5.5 High');
+    // Top 3 by SWE-bench score: opus47-gpt55 (91), opus47-o4high (89.2), opus47-opus47 (88.4)
     expect(container.textContent).toContain('Opus 4.7 x GPT-5.5');
+    expect(container.textContent).toContain('Opus 4.7 x o4 high');
     expect(container.textContent).toContain('Opus 4.7 x Opus 4.7');
   });
 
@@ -172,8 +169,8 @@ describe('TopHarnesses', () => {
 
   it('renders benchmark scores', () => {
     const { container } = render(<TopHarnesses />);
-    expect(container.textContent).toContain('84.5%');
-    expect(container.textContent).toContain('75.3%');
+    expect(container.textContent).toContain('91%');
+    expect(container.textContent).toContain('86%');
   });
 });
 

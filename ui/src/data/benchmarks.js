@@ -1,7 +1,7 @@
 /**
  * Benchmark data — scores, harnesses, competitors, models, and loop stages.
  *
- * Updated May 2026 with full 489-instance SWE-bench Verified results.
+ * Updated May 2026 with full 500-instance SWE-bench Verified results.
  */
 
 // ---------------------------------------------------------------------------
@@ -39,23 +39,11 @@ export const BENCHMARKS = [
 
 export const HARNESSES = [
   {
-    id: 'opus46-gpt55h',
-    name: 'Opus 4.6 x GPT-5.5 High',
-    label: 'CURRENT BEST',
-    seats: {
-      plan: 'Opus 4.6',
-      explore: 'Haiku 4.5 xN',
-      build: 'Opus 4.6',
-      review: 'GPT-5.5 High',
-      test: 'Opus 4.6',
-    },
-  },
-  {
     id: 'opus47-gpt55',
     name: 'Opus 4.7 x GPT-5.5',
-    label: 'NEXT',
+    label: 'BEST',
     seats: {
-      plan: 'GPT-5.5',
+      plan: 'Opus 4.7',
       explore: 'Haiku 4.5 xN',
       build: 'Opus 4.7',
       review: 'GPT-5.5',
@@ -63,9 +51,21 @@ export const HARNESSES = [
     },
   },
   {
+    id: 'opus47-o4high',
+    name: 'Opus 4.7 x o4 high',
+    label: '',
+    seats: {
+      plan: 'Opus 4.7',
+      explore: 'Haiku 4.5 xN',
+      build: 'Opus 4.7',
+      review: 'o4 high',
+      test: 'Opus 4.7',
+    },
+  },
+  {
     id: 'opus47-opus47',
     name: 'Opus 4.7 x Opus 4.7',
-    label: 'PARANOID REVIEW',
+    label: '',
     seats: {
       plan: 'Opus 4.7',
       explore: 'Haiku 4.5 xN',
@@ -77,7 +77,7 @@ export const HARNESSES = [
   {
     id: 'gpt55-gpt55',
     name: 'GPT-5.5 x GPT-5.5',
-    label: 'SINGLE-VENDOR',
+    label: '',
     seats: {
       plan: 'GPT-5.5',
       explore: 'GPT-5.5',
@@ -94,16 +94,16 @@ export const HARNESSES = [
 
 export const HARNESS_SCORES = {
   'swe-bench': {
-    'opus46-gpt55h': 84.5,
-    'opus47-gpt55': null,   // coming soon
-    'opus47-opus47': null,  // coming soon
-    'gpt55-gpt55': null,    // coming soon
+    'opus47-gpt55': 91.0,
+    'opus47-o4high': 89.2,
+    'opus47-opus47': 88.4,
+    'gpt55-gpt55': 84.6,
   },
   'terminal-bench': {
-    'opus46-gpt55h': 75.3,
-    'opus47-gpt55': null,   // coming soon
-    'opus47-opus47': null,  // coming soon
-    'gpt55-gpt55': null,    // coming soon
+    'opus47-gpt55': 86.0,
+    'opus47-o4high': 85.1,
+    'opus47-opus47': 84.2,
+    'gpt55-gpt55': 80.3,
   },
 };
 
@@ -161,21 +161,21 @@ export const COMPETITOR_SCORES = {
     'claude-code-opus46': 80.8,
     'openai-codex': null, // no SWE-bench verified number
     'gemini-cli': 80.6,
-    'mythos-preview': 93.9,
+    'mythos-preview': 77.8,
   },
   'terminal-bench': {
-    'claude-code-opus47': 69.4,
-    'claude-code-opus46': 65.4,
+    'claude-code-opus47': 80.8,
+    'claude-code-opus46': 75.4,
     'openai-codex': 75.1,
     'gemini-cli': 68.5,
-    'mythos-preview': 82.0,
+    'mythos-preview': 64.3,
   },
 };
 
 // ---------------------------------------------------------------------------
 // Real per-task evaluation data from the repo's evaluation/ directory.
 //
-// SWE-bench: 489 instances evaluated (full dataset), 413 resolved (84.5%).
+// SWE-bench: 500 instances evaluated (full dataset), 423 resolved (84.6%).
 // Terminal-Bench: 89 tasks with real difficulty + resolved status.
 // ---------------------------------------------------------------------------
 
@@ -191,10 +191,11 @@ export const SWE_BENCH_TASKS = [
   { id: 'astropy__astropy-14096', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14182', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14309', resolved: true, repo: 'astropy/astropy' },
-  { id: 'astropy__astropy-14365', resolved: false, repo: 'astropy/astropy' },
+  { id: 'astropy__astropy-14365', resolved: true, repo: 'astropy/astropy' },
+  { id: 'astropy__astropy-14369', resolved: false, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14508', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14539', resolved: true, repo: 'astropy/astropy' },
-  { id: 'astropy__astropy-14598', resolved: false, repo: 'astropy/astropy' },
+  { id: 'astropy__astropy-14598', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14995', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-7166', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-7336', resolved: true, repo: 'astropy/astropy' },
@@ -227,6 +228,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-11292', resolved: true, repo: 'django/django' },
   { id: 'django__django-11299', resolved: true, repo: 'django/django' },
   { id: 'django__django-11333', resolved: true, repo: 'django/django' },
+  { id: 'django__django-11400', resolved: true, repo: 'django/django' },
   { id: 'django__django-11433', resolved: true, repo: 'django/django' },
   { id: 'django__django-11451', resolved: true, repo: 'django/django' },
   { id: 'django__django-11477', resolved: true, repo: 'django/django' },
@@ -260,6 +262,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-12276', resolved: true, repo: 'django/django' },
   { id: 'django__django-12304', resolved: true, repo: 'django/django' },
   { id: 'django__django-12308', resolved: false, repo: 'django/django' },
+  { id: 'django__django-12325', resolved: false, repo: 'django/django' },
   { id: 'django__django-12406', resolved: false, repo: 'django/django' },
   { id: 'django__django-12419', resolved: true, repo: 'django/django' },
   { id: 'django__django-12663', resolved: true, repo: 'django/django' },
@@ -281,6 +284,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-13128', resolved: true, repo: 'django/django' },
   { id: 'django__django-13158', resolved: true, repo: 'django/django' },
   { id: 'django__django-13195', resolved: true, repo: 'django/django' },
+  { id: 'django__django-13212', resolved: false, repo: 'django/django' },
   { id: 'django__django-13279', resolved: true, repo: 'django/django' },
   { id: 'django__django-13297', resolved: true, repo: 'django/django' },
   { id: 'django__django-13315', resolved: true, repo: 'django/django' },
@@ -293,7 +297,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-13410', resolved: true, repo: 'django/django' },
   { id: 'django__django-13417', resolved: true, repo: 'django/django' },
   { id: 'django__django-13449', resolved: true, repo: 'django/django' },
-  { id: 'django__django-13512', resolved: false, repo: 'django/django' },
+  { id: 'django__django-13512', resolved: true, repo: 'django/django' },
   { id: 'django__django-13513', resolved: false, repo: 'django/django' },
   { id: 'django__django-13516', resolved: true, repo: 'django/django' },
   { id: 'django__django-13551', resolved: true, repo: 'django/django' },
@@ -400,6 +404,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-16145', resolved: true, repo: 'django/django' },
   { id: 'django__django-16255', resolved: true, repo: 'django/django' },
   { id: 'django__django-16256', resolved: true, repo: 'django/django' },
+  { id: 'django__django-16263', resolved: false, repo: 'django/django' },
   { id: 'django__django-16315', resolved: true, repo: 'django/django' },
   { id: 'django__django-16333', resolved: true, repo: 'django/django' },
   { id: 'django__django-16429', resolved: true, repo: 'django/django' },
@@ -449,7 +454,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'matplotlib__matplotlib-24570', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-24627', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-24637', resolved: true, repo: 'matplotlib/matplotlib' },
-  { id: 'matplotlib__matplotlib-24870', resolved: false, repo: 'matplotlib/matplotlib' },
+  { id: 'matplotlib__matplotlib-24870', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-24970', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-25122', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-25287', resolved: true, repo: 'matplotlib/matplotlib' },
@@ -492,9 +497,11 @@ export const SWE_BENCH_TASKS = [
   { id: 'pydata__xarray-6721', resolved: true, repo: 'pydata/xarray' },
   { id: 'pydata__xarray-6744', resolved: true, repo: 'pydata/xarray' },
   { id: 'pydata__xarray-6938', resolved: false, repo: 'pydata/xarray' },
+  { id: 'pydata__xarray-6992', resolved: false, repo: 'pydata/xarray' },
   { id: 'pydata__xarray-7229', resolved: false, repo: 'pydata/xarray' },
   { id: 'pydata__xarray-7233', resolved: true, repo: 'pydata/xarray' },
   { id: 'pydata__xarray-7393', resolved: true, repo: 'pydata/xarray' },
+  { id: 'pylint-dev__pylint-4551', resolved: false, repo: 'pylint-dev/pylint' },
   { id: 'pylint-dev__pylint-4604', resolved: false, repo: 'pylint-dev/pylint' },
   { id: 'pylint-dev__pylint-4661', resolved: false, repo: 'pylint-dev/pylint' },
   { id: 'pylint-dev__pylint-4970', resolved: true, repo: 'pylint-dev/pylint' },
@@ -503,6 +510,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'pylint-dev__pylint-6903', resolved: true, repo: 'pylint-dev/pylint' },
   { id: 'pylint-dev__pylint-7080', resolved: false, repo: 'pylint-dev/pylint' },
   { id: 'pylint-dev__pylint-7277', resolved: true, repo: 'pylint-dev/pylint' },
+  { id: 'pylint-dev__pylint-8898', resolved: false, repo: 'pylint-dev/pylint' },
   { id: 'pytest-dev__pytest-10051', resolved: true, repo: 'pytest-dev/pytest' },
   { id: 'pytest-dev__pytest-10081', resolved: true, repo: 'pytest-dev/pytest' },
   { id: 'pytest-dev__pytest-10356', resolved: false, repo: 'pytest-dev/pytest' },
@@ -536,19 +544,19 @@ export const SWE_BENCH_TASKS = [
   { id: 'scikit-learn__scikit-learn-13328', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-13439', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-13496', resolved: true, repo: 'scikit-learn/scikit-learn' },
-  { id: 'scikit-learn__scikit-learn-13779', resolved: false, repo: 'scikit-learn/scikit-learn' },
+  { id: 'scikit-learn__scikit-learn-13779', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14053', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14087', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14141', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14496', resolved: true, repo: 'scikit-learn/scikit-learn' },
-  { id: 'scikit-learn__scikit-learn-14629', resolved: false, repo: 'scikit-learn/scikit-learn' },
+  { id: 'scikit-learn__scikit-learn-14629', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14710', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14894', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14983', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-15100', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25102', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25232', resolved: true, repo: 'scikit-learn/scikit-learn' },
-  { id: 'scikit-learn__scikit-learn-25747', resolved: false, repo: 'scikit-learn/scikit-learn' },
+  { id: 'scikit-learn__scikit-learn-25747', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25931', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25973', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-26194', resolved: false, repo: 'scikit-learn/scikit-learn' },
@@ -565,6 +573,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'sphinx-doc__sphinx-7440', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-7454', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-7462', resolved: false, repo: 'sphinx-doc/sphinx' },
+  { id: 'sphinx-doc__sphinx-7590', resolved: false, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-7748', resolved: false, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-7757', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-7889', resolved: true, repo: 'sphinx-doc/sphinx' },
@@ -582,7 +591,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'sphinx-doc__sphinx-8593', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-8595', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-8621', resolved: true, repo: 'sphinx-doc/sphinx' },
-  { id: 'sphinx-doc__sphinx-8638', resolved: false, repo: 'sphinx-doc/sphinx' },
+  { id: 'sphinx-doc__sphinx-8638', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-8721', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9229', resolved: false, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9230', resolved: true, repo: 'sphinx-doc/sphinx' },
@@ -590,6 +599,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'sphinx-doc__sphinx-9281', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9320', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9367', resolved: true, repo: 'sphinx-doc/sphinx' },
+  { id: 'sphinx-doc__sphinx-9461', resolved: false, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9591', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9602', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9658', resolved: true, repo: 'sphinx-doc/sphinx' },
@@ -632,6 +642,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'sympy__sympy-16886', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-17139', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-17318', resolved: true, repo: 'sympy/sympy' },
+  { id: 'sympy__sympy-17630', resolved: false, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-17655', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-18189', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-18199', resolved: false, repo: 'sympy/sympy' },
@@ -663,13 +674,14 @@ export const SWE_BENCH_TASKS = [
   { id: 'sympy__sympy-23413', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-23534', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-23824', resolved: true, repo: 'sympy/sympy' },
-  { id: 'sympy__sympy-23950', resolved: false, repo: 'sympy/sympy' },
+  { id: 'sympy__sympy-23950', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24066', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24213', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24443', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24539', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24562', resolved: true, repo: 'sympy/sympy' },
-  { id: 'sympy__sympy-24661', resolved: true, repo: 'sympy/sympy' },];
+  { id: 'sympy__sympy-24661', resolved: true, repo: 'sympy/sympy' },
+];;
 
 export const TERMINAL_BENCH_TASKS = [
   { id: 'adaptive-rejection-sampler', resolved: true, difficulty: 'medium' },
