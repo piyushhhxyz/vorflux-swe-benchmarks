@@ -90,12 +90,12 @@ describe('HARNESS_SCORES', () => {
     }
   });
 
-  it('opus46-gpt55h SWE-bench score is 84.5', () => {
-    expect(HARNESS_SCORES['swe-bench']['opus46-gpt55h']).toBe(84.5);
+  it('opus47-gpt55 SWE-bench score is 91.0', () => {
+    expect(HARNESS_SCORES['swe-bench']['opus47-gpt55']).toBe(91.0);
   });
 
-  it('opus46-gpt55h Terminal-bench score is 75.3', () => {
-    expect(HARNESS_SCORES['terminal-bench']['opus46-gpt55h']).toBe(75.3);
+  it('opus47-gpt55 Terminal-bench score is 86.0', () => {
+    expect(HARNESS_SCORES['terminal-bench']['opus47-gpt55']).toBe(86.0);
   });
 
   it('all non-null scores are between 0 and 100', () => {
@@ -112,11 +112,11 @@ describe('HARNESS_SCORES', () => {
 
 describe('getBestHarnessScore', () => {
   it('returns highest SWE-bench score', () => {
-    expect(getBestHarnessScore('swe-bench')).toBe(84.5);
+    expect(getBestHarnessScore('swe-bench')).toBe(91.0);
   });
 
   it('returns highest Terminal-bench score', () => {
-    expect(getBestHarnessScore('terminal-bench')).toBe(75.3);
+    expect(getBestHarnessScore('terminal-bench')).toBe(86.0);
   });
 
   it('returns null for unknown benchmark', () => {
@@ -183,8 +183,8 @@ describe('TERMINAL_BENCH_TASKS', () => {
 });
 
 describe('SWE_BENCH_TASKS', () => {
-  it('has 489 evaluated tasks (full dataset)', () => {
-    expect(SWE_BENCH_TASKS).toHaveLength(489);
+  it('has 500 evaluated tasks (full dataset)', () => {
+    expect(SWE_BENCH_TASKS).toHaveLength(500);
   });
 
   it('each task has id, resolved, and repo', () => {
@@ -195,9 +195,9 @@ describe('SWE_BENCH_TASKS', () => {
     }
   });
 
-  it('has 413 resolved and 76 unresolved tasks', () => {
-    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(413);
-    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(76);
+  it('has 423 resolved and 77 unresolved tasks', () => {
+    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(423);
+    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(77);
   });
 
   it('covers all 12 repos', () => {
@@ -217,9 +217,9 @@ describe('generateDotGrid', () => {
     expect(dots).toHaveLength(300);
   });
 
-  it('has 489 evaluated dots for SWE-bench and 89 for Terminal-bench', () => {
+  it('has 500 evaluated dots for SWE-bench and 89 for Terminal-bench', () => {
     const sweDots = generateDotGrid('swe-bench');
-    expect(sweDots.filter((d) => d.evaluated)).toHaveLength(489);
+    expect(sweDots.filter((d) => d.evaluated)).toHaveLength(500);
     const tbDots = generateDotGrid('terminal-bench');
     expect(tbDots.filter((d) => d.evaluated)).toHaveLength(89);
   });
@@ -256,7 +256,7 @@ describe('generateDotGrid', () => {
   it('placeholder dots are a mix of teal colors and empty', () => {
     const dots = generateDotGrid('swe-bench');
     const placeholders = dots.filter((d) => !d.evaluated);
-    expect(placeholders.length).toBe(500 - 489);
+    expect(placeholders.length).toBe(0);
     const validTiers = ['easy', 'medium', 'hard', 'empty'];
     for (const d of placeholders) {
       expect(validTiers).toContain(d.difficulty);

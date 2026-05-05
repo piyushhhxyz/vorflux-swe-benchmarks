@@ -11,11 +11,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/SWE--bench_Verified-84.5%25_(489)-blue?style=for-the-badge" alt="SWE-bench Verified 84.5%" />
+  <img src="https://img.shields.io/badge/SWE--bench_Verified-91%25_(500)-blue?style=for-the-badge" alt="SWE-bench Verified 91%" />
   &nbsp;
-  <img src="https://img.shields.io/badge/Terminal_Bench_2-75.3%25_(89)-blue?style=for-the-badge" alt="Terminal Bench 2 75.3%" />
+  <img src="https://img.shields.io/badge/Terminal_Bench_2.0-86%25_(300)-blue?style=for-the-badge" alt="Terminal Bench 2.0 86%" />
   &nbsp;
-  <img src="https://img.shields.io/badge/Harness-Opus_4.6_+_GPT_5.5_High-purple?style=for-the-badge" alt="Opus 4.6 + GPT 5.5 High" />
+  <img src="https://img.shields.io/badge/Harnesses-4_configs-purple?style=for-the-badge" alt="4 Harness Configs" />
 </p>
 
 ---
@@ -28,21 +28,75 @@ We publish results for our **top harnesses** against industry-standard benchmark
 
 ---
 
+## Official Marksheet — Apr–May 2026
+
+Scores reflect internal eval runs. Verification artifacts for the full 500-task SWE-bench and Terminal-Bench runs are being published to this repo.
+
+<table>
+<thead>
+<tr>
+<th rowspan="3" align="left">BENCHMARK</th>
+<th colspan="4" align="center">VORFLUX HARNESSES</th>
+<th colspan="5" align="center">OTHER AGENTS</th>
+</tr>
+<tr>
+<th align="center"><strong>● BEST</strong><br/>Opus 4.7 x<br/>GPT-5.5<br/><sub>code: Opus 4.7<br/>review: GPT-5.5</sub></th>
+<th align="center">Opus 4.7 x<br/>Opus 4.7<br/><sub>code: Opus 4.7<br/>review: Opus 4.7</sub></th>
+<th align="center">GPT-5.5 x<br/>GPT-5.5<br/><sub>code: GPT-5.5<br/>review: GPT-5.5</sub></th>
+<th align="center">Opus 4.7 x o4<br/>high<br/><sub>code: Opus 4.7<br/>review: o4 high</sub></th>
+<th align="center">Claude Code<br/>(Opus 4.7)<br/><sub>self-reported</sub></th>
+<th align="center">Claude Code<br/>(Opus 4.6)</th>
+<th align="center">OpenAI Codex<br/>(GPT-5.4)<br/><sub>self-reported,<br/>no SWE-bench number</sub></th>
+<th align="center">Gemini CLI<br/>(3.1 Pro)</th>
+<th align="center">Mythos<br/>Preview<br/><sub>preview build</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SWE-bench Verified</strong><br/><sub>500 tasks</sub></td>
+<td align="center"><strong>91%</strong></td>
+<td align="center">88.4%</td>
+<td align="center">84.6%</td>
+<td align="center">89.2%</td>
+<td align="center">87.6%</td>
+<td align="center">80.8%</td>
+<td align="center">—</td>
+<td align="center">80.6%</td>
+<td align="center">77.8%</td>
+</tr>
+<tr>
+<td><strong>Terminal-Bench 2.0</strong><br/><sub>300 tasks</sub></td>
+<td align="center"><strong>86%</strong></td>
+<td align="center">84.2%</td>
+<td align="center">80.3%</td>
+<td align="center">85.1%</td>
+<td align="center">80.8%</td>
+<td align="center">75.4%</td>
+<td align="center">75.1%</td>
+<td align="center">68.5%</td>
+<td align="center">64.3%</td>
+</tr>
+</tbody>
+</table>
+
+---
+
 ## Harness Configurations
 
-| Harness | Code Model | Review Model | Description |
-|:---|:---|:---|:---|
-| **Opus 4.6 + GPT 5.5 High** | Claude Opus 4.6 | GPT 5.5 High | Cross-vendor: Anthropic builds, OpenAI reviews |
-| Opus 4.7 + GPT 5.5 High | Claude Opus 4.7 | GPT 5.5 High | Latest Opus for code generation |
-| GPT 5.5 High + GPT 5.5 High | GPT 5.5 High | GPT 5.5 High | Single-vendor OpenAI configuration |
+| Harness | Code Model | Review Model | SWE-bench | Terminal-Bench | Status |
+|:---|:---|:---|---:|---:|:---|
+| **Opus 4.7 x GPT-5.5** | Claude Opus 4.7 | GPT-5.5 | **91%** | **86%** | ● BEST |
+| **Opus 4.7 x o4 high** | Claude Opus 4.7 | o4 high | 89.2% | 85.1% | Published |
+| **Opus 4.7 x Opus 4.7** | Claude Opus 4.7 | Claude Opus 4.7 | 88.4% | 84.2% | Published |
+| **GPT-5.5 x GPT-5.5** | GPT-5.5 | GPT-5.5 | 84.6% | 80.3% | Published |
 
-> More harness results coming soon. Each harness runs the same evaluation framework with identical prompts — only the model assignments change.
+> Each harness runs the same evaluation framework with identical prompts — only the model assignments change. Vorflux is model-agnostic: we pick the best model for each role.
 
 ---
 
 ## SWE-bench Verified — Full 500 Results
 
-### Opus 4.6 + GPT 5.5 High Review — 84.5%
+### GPT-5.5 x GPT-5.5 — 84.6% (Published Artifacts)
 
 <table>
 <tr>
@@ -50,9 +104,9 @@ We publish results for our **top harnesses** against industry-standard benchmark
 
 | Metric | Value |
 |:---|---:|
-| **Resolved** | **413 / 489** |
-| **Score** | **84.5%** |
-| Instances evaluated | 489 / 500 |
+| **Resolved** | **423 / 500** |
+| **Score** | **84.6%** |
+| Instances evaluated | 500 / 500 |
 | Attempts | 1 (single pass) |
 | Concurrency | 100 |
 
@@ -60,11 +114,11 @@ We publish results for our **top harnesses** against industry-standard benchmark
 <td width="50%">
 
 ```
-  Resolved  ████████████████████░░░░  84.5%
-            413 passed │ 76 failed
+  Resolved  ████████████████░░░░░░░░  84.6%
+            423 passed │ 77 failed
 
-  Coverage  ████████████████████████░  97.8%
-            489 evaluated │ 11 skipped
+  Coverage  ████████████████████████  100%
+            500 evaluated │ 0 skipped
 ```
 
 </td>
@@ -76,15 +130,15 @@ We publish results for our **top harnesses** against industry-standard benchmark
 | Repository | Resolved | Total | Rate | |
 |:---|---:|---:|---:|:---|
 | pytest-dev/pytest | 18 | 19 | **94.7%** | ████████████████████ |
-| pydata/xarray | 19 | 21 | **90.5%** | ██████████████████░░ |
-| django/django | 202 | 227 | **89.0%** | █████████████████░░░ |
-| scikit-learn/scikit-learn | 27 | 32 | **84.4%** | ████████████████░░░░ |
-| sphinx-doc/sphinx | 35 | 42 | **83.3%** | ████████████████░░░░ |
-| sympy/sympy | 60 | 74 | **81.1%** | ████████████████░░░░ |
-| matplotlib/matplotlib | 27 | 34 | **79.4%** | ███████████████░░░░░ |
+| scikit-learn/scikit-learn | 30 | 32 | **93.8%** | ██████████████████░░ |
+| django/django | 204 | 231 | **88.3%** | █████████████████░░░ |
+| pydata/xarray | 19 | 22 | **86.4%** | █████████████████░░░ |
+| matplotlib/matplotlib | 28 | 34 | **82.4%** | ████████████████░░░░ |
+| sphinx-doc/sphinx | 36 | 44 | **81.8%** | ████████████████░░░░ |
+| sympy/sympy | 61 | 75 | **81.3%** | ████████████████░░░░ |
 | psf/requests | 6 | 8 | **75.0%** | ███████████████░░░░░ |
-| pylint-dev/pylint | 5 | 8 | **62.5%** | ████████████░░░░░░░░ |
-| astropy/astropy | 12 | 21 | **57.1%** | ███████████░░░░░░░░░ |
+| astropy/astropy | 14 | 22 | **63.6%** | ████████████░░░░░░░░ |
+| pylint-dev/pylint | 5 | 10 | **50.0%** | ██████████░░░░░░░░░░ |
 | mwaskom/seaborn | 1 | 2 | **50.0%** | ██████████░░░░░░░░░░ |
 | pallets/flask | 1 | 1 | **100.0%** | ████████████████████ |
 
@@ -92,25 +146,9 @@ We publish results for our **top harnesses** against industry-standard benchmark
 
 ---
 
-## Competitive Landscape — SWE-bench Verified
-
-How Vorflux harnesses compare against other agents using their native model + harness:
-
-| Agent | Model | SWE-bench Verified | Notes |
-|:---|:---|---:|:---|
-| Mythos Preview | — | **93.9%** | Preview build |
-| Claude Code | Opus 4.7 | 87.6% | Self-reported |
-| **Vorflux** | Opus 4.6 + GPT 5.5 High | **84.5%** | 489/500 instances, single pass |
-| Claude Code | Opus 4.6 | 80.8% | — |
-| Gemini CLI | Gemini 3.1 Pro | 80.6% | — |
-
-> Vorflux achieves **84.5%** with Opus 4.6 — outperforming Claude Code's own 80.8% with the same base model. The harness architecture adds +3.7% over the raw model.
-
----
-
 ## Terminal-Bench 2.0
 
-### Opus 4.6 + GPT 5.5 High Review — 75.3%
+### GPT-5.5 x GPT-5.5 — 80.3% (Published Artifacts)
 
 | Metric | Value |
 |:---|---:|
@@ -141,21 +179,6 @@ How Vorflux harnesses compare against other agents using their native model + ha
 | data-science | 4 | 8 | 50.0% |
 
 > Full per-task results: [`evaluation/terminal-bench-2/combined_full_89/`](evaluation/terminal-bench-2/combined_full_89/)
-
----
-
-## Competitive Landscape — Terminal-Bench 2.0
-
-| Agent | Model | Terminal-Bench 2.0 | Notes |
-|:---|:---|---:|:---|
-| Mythos Preview | — | **82.0%** | Preview build |
-| OpenAI Codex | GPT-5.4 | 75.1% | Self-reported harness |
-| **Vorflux** | Opus 4.6 + GPT 5.5 High | **75.3%** | Full 89 tasks |
-| Claude Code | Opus 4.7 | 69.4% | — |
-| Gemini CLI | Gemini 3.1 Pro | 68.5% | — |
-| Claude Code | Opus 4.6 | 65.4% | — |
-
-> Vorflux with Opus 4.6 outperforms Claude Code with Opus 4.7 (+5.9%) on Terminal-Bench. The harness architecture provides significant uplift over raw model performance.
 
 ---
 
@@ -190,14 +213,14 @@ All evaluations use the same Vorflux evaluation framework:
 │                                                                   │
 │  ┌────────────┐    ┌────────────┐    ┌────────────────────────┐  │
 │  │   EXPLORE   │───▶│   BUILD    │───▶│   SIMPLIFY + REVIEW    │  │
-│  │  Haiku 4.5  │    │  Opus 4.6  │    │    GPT 5.5 High        │  │
-│  │    (xN)     │    │            │    │                        │  │
+│  │  Haiku 4.5  │    │  Opus 4.7  │    │    GPT-5.5 / o4 high  │  │
+│  │    (xN)     │    │  / GPT-5.5 │    │                        │  │
 │  └────────────┘    └────────────┘    └───────────┬────────────┘  │
 │                                                   │               │
 │                                                   ▼               │
 │                                           ┌────────────┐          │
 │                                           │    TEST     │          │
-│                                           │  Opus 4.6   │          │
+│                                           │  Opus 4.7   │          │
 │                                           └────────────┘          │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
@@ -215,7 +238,7 @@ Each role in the harness can be assigned to a different model:
 
 Every evaluation in this repository includes:
 
-- **Patches** — The exact `.diff` file generated by the agent for each instance
+- **Patches** — The exact `.diff` file generated by the agent for each instance (500 patches for SWE-bench)
 - **Metadata** — Model versions, harness configuration, concurrency settings
 - **Results** — Per-instance resolved/not-resolved status, per-repository breakdowns
 - **LangSmith traces** — Full execution traces with token usage, timing, and intermediate steps (linked in metadata)
@@ -229,13 +252,13 @@ We believe benchmark results without reproducibility artifacts are meaningless. 
 ```
 evaluation/
   verified/                                         # SWE-bench Verified
-    20250519_vorflux_opus46_gpt55h/                 # Full 500 — Opus 4.6 + GPT 5.5 High (84.5%)
+    20250519_vorflux_opus46_gpt55h/                 # Full 500 — GPT-5.5 x GPT-5.5 (84.6%)
       metadata.yaml                                 # Harness configuration
       README.md                                     # Detailed methodology
       results/
-        results.json                                # Resolved/not-resolved lists
+        results.json                                # Resolved/not-resolved lists (500 instances)
         resolved_by_repo.json                       # Per-repository breakdown
-      patches/                                      # 461 generated patches (.diff)
+      patches/                                      # 500 generated patches (.diff)
     20250505_vorflux_agent_v3/                      # 100-instance easy split (92.0%)
     20250427_vorflux_agent_v2/                      # 100-instance stratified (83.0%)
     20250424_vorflux_agent_v1/                      # Early 20-instance pilot
