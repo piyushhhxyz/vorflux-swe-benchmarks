@@ -1,0 +1,41 @@
+diff --git a/django/db/backends/base/schema.py b/django/db/backends/base/schema.py
+index f2ca8c8df9..f74fa1bd93 100644
+--- a/django/db/backends/base/schema.py
++++ b/django/db/backends/base/schema.py
+@@ -528,7 +528,10 @@ class BaseDatabaseSchemaEditor:
+         # Deleted uniques
+         for fields in olds.difference(news):
+             self._delete_composed_index(
+-                model, fields, {"unique": True}, self.sql_delete_unique
++                model,
++                fields,
++                {"unique": True, "primary_key": False},
++                self.sql_delete_unique,
+             )
+         # Created uniques
+         for field_names in news.difference(olds):
+@@ -569,6 +572,24 @@ class BaseDatabaseSchemaEditor:
+             **constraint_kwargs,
+         )
+         if len(constraint_names) != 1:
++            # There may be multiple constraints on these columns if a
++            # field in the unique_together also has unique=True set.
++            # Narrow down by also requiring index=True to prefer the
++            # explicitly created composed index over inline column
++            # constraints. On databases like PostgreSQL where both
++            # constraints have index=False, the retry may return 0
++            # results; in that case any of the matched constraints can
++            # be safely dropped.
++            narrowed = self._constraint_names(
++                model,
++                columns,
++                exclude=meta_constraint_names | meta_index_names,
++                index=True,
++                **constraint_kwargs,
++            )
++            if len(narrowed) == 1:
++                constraint_names = narrowed
++        if len(constraint_names) < 1:
+             raise ValueError(
+                 "Found wrong number (%s) of constraints for %s(%s)"
+                 % (

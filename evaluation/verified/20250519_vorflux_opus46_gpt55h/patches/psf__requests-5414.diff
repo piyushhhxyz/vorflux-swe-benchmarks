@@ -1,0 +1,21 @@
+diff --git a/requests/models.py b/requests/models.py
+index e7d292d5..6caa851b 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -406,6 +406,16 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
+         elif host.startswith(u'*'):
+             raise InvalidURL('URL has an invalid label.')
+ 
++        # Detect invalid hostnames with empty labels (e.g. ".example.com")
++        # before they cause a UnicodeError downstream in the IDNA codec.
++        # Skip IPv6 addresses (enclosed in brackets).
++        if host and not host.startswith('['):
++            # Strip a single trailing dot (valid FQDN notation)
++            _host = host.rstrip('.')
++            for label in _host.split('.'):
++                if not label:
++                    raise InvalidURL('URL has an invalid label.')
++
+         # Carefully reconstruct the network location
+         netloc = auth or ''
+         if netloc:

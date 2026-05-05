@@ -1,0 +1,60 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index dab2bc4a5..589778db1 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -2274,12 +2274,51 @@ class SubFigure(FigureBase):
+             return
+         # need to figure out *where* this subplotspec is.
+         gs = self._subplotspec.get_gridspec()
++        nrows, ncols = gs.get_geometry()
++        # Use the gridspec's explicit wspace/hspace if set; default to 0 so
++        # that subfigures fill the parent when spacing is not specified.
++        # This matches the historical behaviour while making explicit
++        # wspace/hspace values take effect.
++        wspace = getattr(gs, 'wspace', None)
++        if wspace is None:
++            wspace = getattr(gs, '_wspace', None)
++        if wspace is None:
++            wspace = 0
++        hspace = getattr(gs, 'hspace', None)
++        if hspace is None:
++            hspace = getattr(gs, '_hspace', None)
++        if hspace is None:
++            hspace = 0
+         wr = np.asarray(gs.get_width_ratios())
+         hr = np.asarray(gs.get_height_ratios())
+-        dx = wr[self._subplotspec.colspan].sum() / wr.sum()
+-        dy = hr[self._subplotspec.rowspan].sum() / hr.sum()
+-        x0 = wr[:self._subplotspec.colspan.start].sum() / wr.sum()
+-        y0 = 1 - hr[:self._subplotspec.rowspan.stop].sum() / hr.sum()
++        # Compute cell widths/heights in [0, 1] space with spacing applied.
++        cell_w = 1.0 / (ncols + wspace * (ncols - 1))
++        sep_w = wspace * cell_w
++        norm_w = cell_w * ncols / wr.sum()
++        cell_widths = wr * norm_w
++        sep_widths = np.concatenate([[0], np.full(ncols - 1, sep_w)])
++        cell_ws = np.cumsum(
++            np.column_stack([sep_widths, cell_widths]).flat)
++        fig_lefts, fig_rights = cell_ws.reshape((-1, 2)).T
++
++        cell_h = 1.0 / (nrows + hspace * (nrows - 1))
++        sep_h = hspace * cell_h
++        norm_h = cell_h * nrows / hr.sum()
++        cell_heights = hr * norm_h
++        sep_heights = np.concatenate([[0], np.full(nrows - 1, sep_h)])
++        cell_hs = np.cumsum(
++            np.column_stack([sep_heights, cell_heights]).flat)
++        fig_tops, fig_bottoms = (1 - cell_hs).reshape((-1, 2)).T
++
++        rows, cols = np.unravel_index(
++            [self._subplotspec.num1, self._subplotspec.num2],
++            (nrows, ncols))
++        x0 = fig_lefts[cols].min()
++        x1 = fig_rights[cols].max()
++        y0 = fig_bottoms[rows].min()
++        y1 = fig_tops[rows].max()
++        dx = x1 - x0
++        dy = y1 - y0
+         if self.bbox_relative is None:
+             self.bbox_relative = Bbox.from_bounds(x0, y0, dx, dy)
+         else:

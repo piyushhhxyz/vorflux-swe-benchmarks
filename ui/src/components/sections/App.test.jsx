@@ -71,10 +71,10 @@ describe('SectionHeader', () => {
 describe('HarnessPicker — interaction', () => {
   it('renders all four harness tabs', () => {
     render(<HarnessPicker />);
-    expect(screen.getAllByText('BEST RESULT').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('CURRENT BEST').length).toBeGreaterThan(0);
     expect(screen.getAllByText('PARANOID REVIEW').length).toBeGreaterThan(0);
     expect(screen.getAllByText('SINGLE-VENDOR').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('DEEP REVIEW').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('NEXT').length).toBeGreaterThan(0);
   });
 
   it('switches active harness on tab click', () => {
@@ -101,8 +101,8 @@ describe('TaskAtlas — interaction', () => {
 
   it('toggles between benchmarks', () => {
     const { container } = render(<TaskAtlas />);
-    // Default is SWE-bench — should show 87 evaluated tasks
-    expect(container.textContent).toContain('87');
+    // Default is SWE-bench — should show 489 evaluated tasks
+    expect(container.textContent).toContain('489');
 
     // Click Terminal-Bench toggle
     const termToggle = screen.getByRole('button', { name: /Terminal-Bench/ });
@@ -159,9 +159,9 @@ describe('ModelComparison — agent comparison', () => {
 describe('TopHarnesses', () => {
   it('shows top 3 harness names', () => {
     const { container } = render(<TopHarnesses />);
-    // Top 3 by SWE-bench score: opus47-gpt55 (91.0), opus47-o4high (89.2), opus47-opus47 (88.4)
+    // Top 3 by SWE-bench score: opus46-gpt55h (84.5), others null
+    expect(container.textContent).toContain('Opus 4.6 x GPT-5.5 High');
     expect(container.textContent).toContain('Opus 4.7 x GPT-5.5');
-    expect(container.textContent).toContain('Opus 4.7 x o4 high');
     expect(container.textContent).toContain('Opus 4.7 x Opus 4.7');
   });
 
@@ -172,8 +172,8 @@ describe('TopHarnesses', () => {
 
   it('renders benchmark scores', () => {
     const { container } = render(<TopHarnesses />);
-    expect(container.textContent).toContain('91%');
-    expect(container.textContent).toContain('86%');
+    expect(container.textContent).toContain('84.5%');
+    expect(container.textContent).toContain('75.3%');
   });
 });
 

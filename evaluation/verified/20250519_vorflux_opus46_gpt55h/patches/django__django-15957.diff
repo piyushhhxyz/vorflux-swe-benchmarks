@@ -1,0 +1,54 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index be0deb90b0..cc4fa71949 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -2448,6 +2448,19 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
+     # The 'values to be matched' must be hashable as they will be used
+     # in a dictionary.
+ 
++    db_queryset = lookup.get_current_queryset(level)
++    # Handle sliced querysets: save the slice and clear it so that
++    # get_prefetch_queryset() can add filters. The slice will be applied
++    # per-object after grouping the results.
++    if db_queryset is not None and db_queryset.query.is_sliced:
++        sliced_queryset = db_queryset
++        low_mark = sliced_queryset.query.low_mark
++        high_mark = sliced_queryset.query.high_mark
++        db_queryset = sliced_queryset._chain()
++        db_queryset.query.clear_limits()
++    else:
++        low_mark, high_mark = 0, None
++
+     (
+         rel_qs,
+         rel_obj_attr,
+@@ -2455,7 +2468,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
+         single,
+         cache_name,
+         is_descriptor,
+-    ) = prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level))
++    ) = prefetcher.get_prefetch_queryset(instances, db_queryset)
+     # We have to handle the possibility that the QuerySet we just got back
+     # contains some prefetch_related lookups. We don't want to trigger the
+     # prefetch_related functionality by evaluating the query. Rather, we need
+@@ -2479,6 +2492,11 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
+         rel_attr_val = rel_obj_attr(rel_obj)
+         rel_obj_cache.setdefault(rel_attr_val, []).append(rel_obj)
+ 
++    # Apply per-object slicing if the original queryset was sliced.
++    if high_mark is not None or low_mark:
++        for attr_val in rel_obj_cache:
++            rel_obj_cache[attr_val] = rel_obj_cache[attr_val][low_mark:high_mark]
++
+     to_attr, as_attr = lookup.get_current_to_attr(level)
+     # Make sure `to_attr` does not conflict with a field.
+     if as_attr and instances:
+@@ -2520,7 +2538,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
+             else:
+                 manager = getattr(obj, to_attr)
+                 if leaf and lookup.queryset is not None:
+-                    qs = manager._apply_rel_filters(lookup.queryset)
++                    qs = manager._apply_rel_filters(db_queryset)
+                 else:
+                     qs = manager.get_queryset()
+                 qs._result_cache = vals

@@ -1,0 +1,42 @@
+diff --git a/django/db/models/fields/related_descriptors.py b/django/db/models/fields/related_descriptors.py
+index d5aa968400..5f12b510a4 100644
+--- a/django/db/models/fields/related_descriptors.py
++++ b/django/db/models/fields/related_descriptors.py
+@@ -145,7 +145,11 @@ class ForwardManyToOneDescriptor:
+         if not remote_field.multiple:
+             for rel_obj in queryset:
+                 instance = instances_dict[rel_obj_attr(rel_obj)]
+-                remote_field.set_cached_value(rel_obj, instance)
++                # Do not overwrite the cache if the related object was
++                # already populated by a nested prefetch (which executes
++                # inside _fetch_all() before this loop body runs).
++                if not remote_field.is_cached(rel_obj):
++                    remote_field.set_cached_value(rel_obj, instance)
+         return queryset, rel_obj_attr, instance_attr, True, self.field.get_cache_name(), False
+ 
+     def get_object(self, instance):
+@@ -377,7 +381,11 @@ class ReverseOneToOneDescriptor:
+         # we must manage the reverse relation cache manually.
+         for rel_obj in queryset:
+             instance = instances_dict[rel_obj_attr(rel_obj)]
+-            self.related.field.set_cached_value(rel_obj, instance)
++            # Do not overwrite the cache if the related object was
++            # already populated by a nested prefetch (which executes
++            # inside _fetch_all() before this loop body runs).
++            if not self.related.field.is_cached(rel_obj):
++                self.related.field.set_cached_value(rel_obj, instance)
+         return queryset, rel_obj_attr, instance_attr, True, self.related.get_cache_name(), False
+ 
+     def __get__(self, instance, cls=None):
+@@ -647,7 +655,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
+             # the reverse relation manually.
+             for rel_obj in queryset:
+                 instance = instances_dict[rel_obj_attr(rel_obj)]
+-                setattr(rel_obj, self.field.name, instance)
++                # Do not overwrite the cache if the related object was
++                # already populated by a nested prefetch (which executes
++                # inside _fetch_all() before this loop body runs).
++                if not self.field.is_cached(rel_obj):
++                    self.field.set_cached_value(rel_obj, instance)
+             cache_name = self.field.remote_field.get_cache_name()
+             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
