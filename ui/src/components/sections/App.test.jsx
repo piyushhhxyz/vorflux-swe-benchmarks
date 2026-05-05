@@ -69,16 +69,16 @@ describe('SectionHeader', () => {
 });
 
 describe('HarnessPicker — interaction', () => {
-  it('renders all four harness tabs', () => {
+  it('renders harness tabs', () => {
     render(<HarnessPicker />);
     expect(screen.getAllByText('BEST').length).toBeGreaterThan(0);
   });
 
   it('switches active harness on tab click', () => {
     render(<HarnessPicker />);
-    const tab = screen.getAllByText('Opus 4.7 x Opus 4.7')[0];
+    const tab = screen.getAllByText('GPT-5.5 High x Opus 4.7 Thinking')[0];
     fireEvent.click(tab);
-    expect(screen.getAllByText('Opus 4.7 x Opus 4.7').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('GPT-5.5 High x Opus 4.7 Thinking').length).toBeGreaterThan(0);
   });
 });
 
@@ -154,12 +154,9 @@ describe('ModelComparison — agent comparison', () => {
 });
 
 describe('TopHarnesses', () => {
-  it('shows top 3 harness names', () => {
+  it('shows top harness names', () => {
     const { container } = render(<TopHarnesses />);
-    // Top 3 by SWE-bench score: opus47-gpt55 (91), opus47-o4high (89.2), opus47-opus47 (88.4)
-    expect(container.textContent).toContain('Opus 4.7 x GPT-5.5');
-    expect(container.textContent).toContain('Opus 4.7 x o4 high');
-    expect(container.textContent).toContain('Opus 4.7 x Opus 4.7');
+    expect(container.textContent).toContain('Opus 4.6 x GPT-5.5 High');
   });
 
   it('shows BEST badge on first harness', () => {
@@ -169,8 +166,8 @@ describe('TopHarnesses', () => {
 
   it('renders benchmark scores', () => {
     const { container } = render(<TopHarnesses />);
-    expect(container.textContent).toContain('91%');
-    expect(container.textContent).toContain('86%');
+    expect(container.textContent).toContain('82.6%');
+    expect(container.textContent).toContain('75.3%');
   });
 });
 

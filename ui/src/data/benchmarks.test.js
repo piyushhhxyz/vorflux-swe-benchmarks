@@ -40,8 +40,8 @@ describe('EVAL_DATE', () => {
 });
 
 describe('HARNESSES', () => {
-  it('has four harness configurations', () => {
-    expect(HARNESSES).toHaveLength(4);
+  it('has three harness configurations', () => {
+    expect(HARNESSES).toHaveLength(3);
   });
 
   it('each harness has required fields', () => {
@@ -90,12 +90,12 @@ describe('HARNESS_SCORES', () => {
     }
   });
 
-  it('opus47-gpt55 SWE-bench score is 91.0', () => {
-    expect(HARNESS_SCORES['swe-bench']['opus47-gpt55']).toBe(91.0);
+  it('opus46-gpt55h SWE-bench score is 82.6', () => {
+    expect(HARNESS_SCORES['swe-bench']['opus46-gpt55h']).toBe(82.6);
   });
 
-  it('opus47-gpt55 Terminal-bench score is 86.0', () => {
-    expect(HARNESS_SCORES['terminal-bench']['opus47-gpt55']).toBe(86.0);
+  it('opus46-gpt55h Terminal-bench score is 75.3', () => {
+    expect(HARNESS_SCORES['terminal-bench']['opus46-gpt55h']).toBe(75.3);
   });
 
   it('all non-null scores are between 0 and 100', () => {
@@ -112,11 +112,11 @@ describe('HARNESS_SCORES', () => {
 
 describe('getBestHarnessScore', () => {
   it('returns highest SWE-bench score', () => {
-    expect(getBestHarnessScore('swe-bench')).toBe(91.0);
+    expect(getBestHarnessScore('swe-bench')).toBe(82.6);
   });
 
   it('returns highest Terminal-bench score', () => {
-    expect(getBestHarnessScore('terminal-bench')).toBe(86.0);
+    expect(getBestHarnessScore('terminal-bench')).toBe(75.3);
   });
 
   it('returns null for unknown benchmark', () => {
@@ -195,9 +195,9 @@ describe('SWE_BENCH_TASKS', () => {
     }
   });
 
-  it('has 423 resolved and 77 unresolved tasks', () => {
-    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(423);
-    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(77);
+  it('has 413 resolved and 87 unresolved tasks', () => {
+    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(413);
+    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(87);
   });
 
   it('covers all 12 repos', () => {
