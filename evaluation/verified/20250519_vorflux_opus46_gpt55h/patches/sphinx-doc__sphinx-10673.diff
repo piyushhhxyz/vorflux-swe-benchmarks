@@ -1,0 +1,50 @@
+diff --git a/sphinx/directives/other.py b/sphinx/directives/other.py
+index 35e16e623..965f18858 100644
+--- a/sphinx/directives/other.py
++++ b/sphinx/directives/other.py
+@@ -122,13 +122,17 @@ class TocTree(SphinxDirective):
+                     if excluded(self.env.doc2path(docname, False)):
+                         message = __('toctree contains reference to excluded document %r')
+                         subtype = 'excluded'
++                        logger.warning(message, docname, type='toc', subtype=subtype,
++                                       location=toctree)
++                        self.env.note_reread()
++                    elif docname in self.env.domaindata['std']['labels']:
++                        toctree['entries'].append((title, docname))
+                     else:
+                         message = __('toctree contains reference to nonexisting document %r')
+                         subtype = 'not_readable'
+-
+-                    logger.warning(message, docname, type='toc', subtype=subtype,
+-                                   location=toctree)
+-                    self.env.note_reread()
++                        logger.warning(message, docname, type='toc', subtype=subtype,
++                                       location=toctree)
++                        self.env.note_reread()
+                 else:
+                     if docname in all_docnames:
+                         all_docnames.remove(docname)
+diff --git a/sphinx/environment/adapters/toctree.py b/sphinx/environment/adapters/toctree.py
+index 9678e3c7c..6624ccff1 100644
+--- a/sphinx/environment/adapters/toctree.py
++++ b/sphinx/environment/adapters/toctree.py
+@@ -139,6 +139,19 @@ class TocTree:
+                         item = nodes.list_item('', para)
+                         # don't show subitems
+                         toc = nodes.bullet_list('', item)
++                    elif ref in self.env.domaindata['std']['labels']:
++                        # special pages like genindex, modindex, search
++                        docname, labelid, sectname = \
++                            self.env.domaindata['std']['labels'][ref]
++                        if not title:
++                            title = sectname
++                        reference = nodes.reference('', '', internal=True,
++                                                    refuri=docname,
++                                                    anchorname='',
++                                                    *[nodes.Text(title)])
++                        para = addnodes.compact_paragraph('', '', reference)
++                        item = nodes.list_item('', para)
++                        toc = nodes.bullet_list('', item)
+                     else:
+                         if ref in parents:
+                             logger.warning(__('circular toctree references '

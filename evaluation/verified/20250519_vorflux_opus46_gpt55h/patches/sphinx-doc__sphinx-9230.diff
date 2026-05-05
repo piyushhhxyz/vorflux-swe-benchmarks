@@ -1,0 +1,44 @@
+diff --git a/sphinx/util/docfields.py b/sphinx/util/docfields.py
+index 3a3367ebe..761adb73a 100644
+--- a/sphinx/util/docfields.py
++++ b/sphinx/util/docfields.py
+@@ -35,6 +35,30 @@ def _is_single_paragraph(node: nodes.field_body) -> bool:
+     return False
+ 
+ 
++def _split_type_and_name(fieldarg: str) -> tuple:
++    """Split a typed field argument like ``dict(str, str) name`` into type and
++    name, respecting balanced parentheses in the type so that commas and spaces
++    inside parentheses do not cause a premature split.
++
++    Raises ValueError if no split point is found (i.e. no whitespace outside
++    parentheses).
++    """
++    depth = 0
++    for i, char in enumerate(fieldarg):
++        if char == '(':
++            depth += 1
++        elif char == ')':
++            depth -= 1
++        elif char in (' ', '\t') and depth == 0:
++            # first whitespace outside parentheses – split here
++            argtype = fieldarg[:i].strip()
++            argname = fieldarg[i:].strip()
++            if argtype and argname:
++                return argtype, argname
++            break
++    raise ValueError('fieldarg has no type/name split')
++
++
+ class Field:
+     """A doc field that is never grouped.  It can have an argument or not, the
+     argument can be linked using a specified *rolename*.  Field should be used
+@@ -298,7 +322,7 @@ class DocFieldTransformer:
+             # also support syntax like ``:param type name:``
+             if typedesc.is_typed:
+                 try:
+-                    argtype, argname = fieldarg.split(None, 1)
++                    argtype, argname = _split_type_and_name(fieldarg)
+                 except ValueError:
+                     pass
+                 else:
