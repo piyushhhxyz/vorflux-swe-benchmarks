@@ -11,20 +11,20 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/SWE--bench_Verified-83.0%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="SWE-bench Verified 83.0%" />
+  <img src="https://img.shields.io/badge/SWE--bench_Verified-92.0%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="SWE-bench Verified 92.0%" />
   &nbsp;
   <img src="https://img.shields.io/badge/Terminal_Bench_2-75.3%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="Terminal Bench 2 75.3%" />
   &nbsp;
-  <img src="https://img.shields.io/badge/Model-Claude_Sonnet_4-purple?style=for-the-badge" alt="Claude Sonnet 4" />
+  <img src="https://img.shields.io/badge/Model-Claude_Opus_4.6-purple?style=for-the-badge" alt="Claude Opus 4.6" />
 </p>
 
 ---
 
 ## Highlights
 
-- **83.0% resolve rate** on a 100-instance split from [SWE-bench Verified](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified) (500 instances)
+- **92.0% resolve rate** on a 100-instance easy split from [SWE-bench Verified](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified) (500 instances) — with retries
+- **83.0% resolve rate** on a 100-instance stratified split from SWE-bench Verified — single attempt
 - **75.3% resolve rate** on the full 89-task [Terminal Bench 2](https://tbench.ai) benchmark (best-ever across experiment runs)
-- **Single attempt per instance** — no retries, no iterative refinement, no per-instance tuning
 - All results independently verified via automated test suites
 
 ---
@@ -33,14 +33,38 @@
 
 | Benchmark | Model | Resolved | Total | Score |
 |:---|:---|---:|---:|---:|
-| [SWE-bench Verified](evaluation/verified/20250427_vorflux_agent_v2/) | Claude Sonnet 4 | **83** | 100 | **83.0%** |
+| [SWE-bench Verified (easy split)](evaluation/verified/20250505_vorflux_agent_v3/) | Claude Opus 4.6 | **92** | 100 | **92.0%** |
+| [SWE-bench Verified (stratified)](evaluation/verified/20250427_vorflux_agent_v2/) | Claude Sonnet 4 | **83** | 100 | **83.0%** |
 | [Terminal Bench 2](evaluation/terminal-bench-2/combined_full_89/) | Claude Sonnet 4 | **67** | 89 | **75.3%** |
 
 ---
 
 ## SWE-bench Verified
 
-### Results by Difficulty
+### Latest: Easy Split (100 instances) — 92.0%
+
+| Metric | Value |
+|:---|---:|
+| Model (code) | Claude Opus 4.6 |
+| Model (review) | GPT 5.5 High |
+| Resolved | 92 / 100 |
+| Attempts | 3 (1 original + 2 retries on failures) |
+
+#### Results by Repository
+
+| Repository | Resolved | Total | Rate |
+|:---|---:|---:|---:|
+| django/django | 76 | 81 | 93.8% |
+| matplotlib/matplotlib | 11 | 14 | 78.6% |
+| astropy/astropy | 3 | 3 | 100.0% |
+| pallets/flask | 1 | 1 | 100.0% |
+| psf/requests | 1 | 1 | 100.0% |
+
+> See [detailed results](evaluation/verified/20250505_vorflux_agent_v3/) for per-instance analysis, patches, and session links.
+
+### Previous: Stratified Split (100 instances) — 83.0%
+
+#### Results by Difficulty
 
 | Difficulty | Resolved | Total | Rate |
 |:---|---:|---:|---:|
@@ -114,9 +138,8 @@ Of the 22 unresolved tasks:
 
 ## Methodology
 
-- **Single attempt** per instance — no retries or iterative refinement
-- **Identical configuration and prompt** across all instances — no per-instance tuning
-- **SWE-bench:** Evaluated using the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench). Each generated patch is independently verified against the project's full test suite (fail-to-pass and pass-to-pass).
+- **SWE-bench (v3, easy split):** 100 instances run with concurrency=100. Failed instances retried twice with independent sessions. Best result across attempts counts. Evaluated using the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench). Each generated patch is independently verified against the project's full test suite (fail-to-pass and pass-to-pass).
+- **SWE-bench (v2, stratified):** Single attempt per instance — no retries, no iterative refinement, no per-instance tuning. Same Docker harness verification.
 - **Terminal Bench 2:** Each task runs inside a pre-built Docker container. The agent pulls the container, explores the environment, implements the solution, and verifies it. Results are verified by running the benchmark's test suite inside the container via MCP. Best-ever scoring: a task counts as resolved if it passed at least once across all experiment runs.
 
 ---
@@ -132,7 +155,14 @@ Of the 22 unresolved tasks:
 ```
 evaluation/
   verified/                                    # SWE-bench Verified
-    20250427_vorflux_agent_v2/                 # 100-instance evaluation run
+    20250505_vorflux_agent_v3/                 # 100-instance easy split (92.0%)
+      metadata.yaml                            # Agent and model configuration
+      README.md                                # Detailed results and methodology
+      results/
+        results.json                           # Resolved instance list
+        resolved_by_repo.json                  # Breakdown by repository
+      patches/                                 # Generated patches (.diff per instance)
+    20250427_vorflux_agent_v2/                 # 100-instance stratified split (83.0%)
       metadata.yaml                            # Agent and model configuration
       README.md                                # Detailed results and methodology
       results/
