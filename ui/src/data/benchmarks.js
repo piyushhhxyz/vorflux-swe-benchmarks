@@ -39,51 +39,39 @@ export const BENCHMARKS = [
 
 export const HARNESSES = [
   {
-    id: 'opus47-gpt55',
-    name: 'Opus 4.7 x GPT-5.5',
+    id: 'opus46-gpt55h',
+    name: 'Opus 4.6 x GPT-5.5 High',
     label: 'BEST',
     seats: {
-      plan: 'Opus 4.7',
+      plan: 'Opus 4.6',
       explore: 'Haiku 4.5 xN',
-      build: 'Opus 4.7',
-      review: 'GPT-5.5',
-      test: 'Opus 4.7',
+      build: 'Opus 4.6',
+      review: 'GPT-5.5 High',
+      test: 'Opus 4.6',
     },
   },
   {
-    id: 'opus47-o4high',
-    name: 'Opus 4.7 x o4 high',
+    id: 'gpt55h-opus47t',
+    name: 'GPT-5.5 High x Opus 4.7 Thinking',
     label: '',
     seats: {
-      plan: 'Opus 4.7',
+      plan: 'GPT-5.5 High',
       explore: 'Haiku 4.5 xN',
-      build: 'Opus 4.7',
-      review: 'o4 high',
-      test: 'Opus 4.7',
+      build: 'GPT-5.5 High',
+      review: 'Opus 4.7 Thinking',
+      test: 'GPT-5.5 High',
     },
   },
   {
-    id: 'opus47-opus47',
-    name: 'Opus 4.7 x Opus 4.7',
+    id: 'tbd-harness-3',
+    name: 'TBD',
     label: '',
     seats: {
-      plan: 'Opus 4.7',
-      explore: 'Haiku 4.5 xN',
-      build: 'Opus 4.7',
-      review: 'Opus 4.7',
-      test: 'Opus 4.7',
-    },
-  },
-  {
-    id: 'gpt55-gpt55',
-    name: 'GPT-5.5 x GPT-5.5',
-    label: '',
-    seats: {
-      plan: 'GPT-5.5',
-      explore: 'GPT-5.5',
-      build: 'GPT-5.5',
-      review: 'GPT-5.5',
-      test: 'GPT-5.5',
+      plan: 'TBD',
+      explore: 'TBD',
+      build: 'TBD',
+      review: 'TBD',
+      test: 'TBD',
     },
   },
 ];
@@ -94,16 +82,14 @@ export const HARNESSES = [
 
 export const HARNESS_SCORES = {
   'swe-bench': {
-    'opus47-gpt55': 91.0,
-    'opus47-o4high': 89.2,
-    'opus47-opus47': 88.4,
-    'gpt55-gpt55': 84.6,
+    'opus46-gpt55h': 82.6,
+    'gpt55h-opus47t': null,   // coming soon
+    'tbd-harness-3': null,    // planned
   },
   'terminal-bench': {
-    'opus47-gpt55': 86.0,
-    'opus47-o4high': 85.1,
-    'opus47-opus47': 84.2,
-    'gpt55-gpt55': 80.3,
+    'opus46-gpt55h': 75.3,
+    'gpt55h-opus47t': null,   // coming soon
+    'tbd-harness-3': null,    // planned
   },
 };
 
@@ -175,7 +161,7 @@ export const COMPETITOR_SCORES = {
 // ---------------------------------------------------------------------------
 // Real per-task evaluation data from the repo's evaluation/ directory.
 //
-// SWE-bench: 500 instances evaluated (full dataset), 423 resolved (84.6%).
+// SWE-bench: 500 instances (full dataset), 413 resolved (82.6%).
 // Terminal-Bench: 89 tasks with real difficulty + resolved status.
 // ---------------------------------------------------------------------------
 
@@ -191,11 +177,11 @@ export const SWE_BENCH_TASKS = [
   { id: 'astropy__astropy-14096', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14182', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14309', resolved: true, repo: 'astropy/astropy' },
-  { id: 'astropy__astropy-14365', resolved: true, repo: 'astropy/astropy' },
+  { id: 'astropy__astropy-14365', resolved: false, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14369', resolved: false, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14508', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14539', resolved: true, repo: 'astropy/astropy' },
-  { id: 'astropy__astropy-14598', resolved: true, repo: 'astropy/astropy' },
+  { id: 'astropy__astropy-14598', resolved: false, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-14995', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-7166', resolved: true, repo: 'astropy/astropy' },
   { id: 'astropy__astropy-7336', resolved: true, repo: 'astropy/astropy' },
@@ -228,7 +214,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-11292', resolved: true, repo: 'django/django' },
   { id: 'django__django-11299', resolved: true, repo: 'django/django' },
   { id: 'django__django-11333', resolved: true, repo: 'django/django' },
-  { id: 'django__django-11400', resolved: true, repo: 'django/django' },
+  { id: 'django__django-11400', resolved: false, repo: 'django/django' },
   { id: 'django__django-11433', resolved: true, repo: 'django/django' },
   { id: 'django__django-11451', resolved: true, repo: 'django/django' },
   { id: 'django__django-11477', resolved: true, repo: 'django/django' },
@@ -297,7 +283,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'django__django-13410', resolved: true, repo: 'django/django' },
   { id: 'django__django-13417', resolved: true, repo: 'django/django' },
   { id: 'django__django-13449', resolved: true, repo: 'django/django' },
-  { id: 'django__django-13512', resolved: true, repo: 'django/django' },
+  { id: 'django__django-13512', resolved: false, repo: 'django/django' },
   { id: 'django__django-13513', resolved: false, repo: 'django/django' },
   { id: 'django__django-13516', resolved: true, repo: 'django/django' },
   { id: 'django__django-13551', resolved: true, repo: 'django/django' },
@@ -454,7 +440,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'matplotlib__matplotlib-24570', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-24627', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-24637', resolved: true, repo: 'matplotlib/matplotlib' },
-  { id: 'matplotlib__matplotlib-24870', resolved: true, repo: 'matplotlib/matplotlib' },
+  { id: 'matplotlib__matplotlib-24870', resolved: false, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-24970', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-25122', resolved: true, repo: 'matplotlib/matplotlib' },
   { id: 'matplotlib__matplotlib-25287', resolved: true, repo: 'matplotlib/matplotlib' },
@@ -544,19 +530,19 @@ export const SWE_BENCH_TASKS = [
   { id: 'scikit-learn__scikit-learn-13328', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-13439', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-13496', resolved: true, repo: 'scikit-learn/scikit-learn' },
-  { id: 'scikit-learn__scikit-learn-13779', resolved: true, repo: 'scikit-learn/scikit-learn' },
+  { id: 'scikit-learn__scikit-learn-13779', resolved: false, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14053', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14087', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14141', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14496', resolved: true, repo: 'scikit-learn/scikit-learn' },
-  { id: 'scikit-learn__scikit-learn-14629', resolved: true, repo: 'scikit-learn/scikit-learn' },
+  { id: 'scikit-learn__scikit-learn-14629', resolved: false, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14710', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14894', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-14983', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-15100', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25102', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25232', resolved: true, repo: 'scikit-learn/scikit-learn' },
-  { id: 'scikit-learn__scikit-learn-25747', resolved: true, repo: 'scikit-learn/scikit-learn' },
+  { id: 'scikit-learn__scikit-learn-25747', resolved: false, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25931', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-25973', resolved: true, repo: 'scikit-learn/scikit-learn' },
   { id: 'scikit-learn__scikit-learn-26194', resolved: false, repo: 'scikit-learn/scikit-learn' },
@@ -591,7 +577,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'sphinx-doc__sphinx-8593', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-8595', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-8621', resolved: true, repo: 'sphinx-doc/sphinx' },
-  { id: 'sphinx-doc__sphinx-8638', resolved: true, repo: 'sphinx-doc/sphinx' },
+  { id: 'sphinx-doc__sphinx-8638', resolved: false, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-8721', resolved: true, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9229', resolved: false, repo: 'sphinx-doc/sphinx' },
   { id: 'sphinx-doc__sphinx-9230', resolved: true, repo: 'sphinx-doc/sphinx' },
@@ -674,7 +660,7 @@ export const SWE_BENCH_TASKS = [
   { id: 'sympy__sympy-23413', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-23534', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-23824', resolved: true, repo: 'sympy/sympy' },
-  { id: 'sympy__sympy-23950', resolved: true, repo: 'sympy/sympy' },
+  { id: 'sympy__sympy-23950', resolved: false, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24066', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24213', resolved: true, repo: 'sympy/sympy' },
   { id: 'sympy__sympy-24443', resolved: true, repo: 'sympy/sympy' },

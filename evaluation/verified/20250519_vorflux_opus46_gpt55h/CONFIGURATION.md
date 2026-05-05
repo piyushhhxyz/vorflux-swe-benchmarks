@@ -1,15 +1,15 @@
-# Agent Configuration — GPT-5.5 x GPT-5.5 Harness
+# Agent Configuration — Opus 4.6 + GPT-5.5 High Harness
 
 ## Model Assignments
 
 | Role | Model | Provider | Purpose |
 |:---|:---|:---|:---|
-| **Plan** | GPT-5.5 | OpenAI | Reads the issue, plans the approach |
-| **Explore** | GPT-5.5 (x N) | OpenAI | Parallel codebase investigation subagents |
-| **Build** | GPT-5.5 | OpenAI | Implements the fix (code generation) |
-| **Simplify** | GPT-5.5 | OpenAI | Refactors for clarity and minimalism |
-| **Review** | GPT-5.5 | OpenAI | Code review for correctness |
-| **Test** | GPT-5.5 | OpenAI | Applies feedback, runs verification |
+| **Plan** | Claude Opus 4.6 | Anthropic | Reads the issue, plans the approach |
+| **Explore** | Claude Haiku 4.5 (x N) | Anthropic | Parallel codebase investigation subagents |
+| **Build** | Claude Opus 4.6 | Anthropic | Implements the fix (code generation) |
+| **Simplify** | Claude Opus 4.6 | Anthropic | Refactors for clarity and minimalism |
+| **Review** | GPT-5.5 High | OpenAI | Cross-vendor code review for correctness |
+| **Test** | Claude Opus 4.6 | Anthropic | Applies feedback, runs verification |
 
 ## Evaluation Parameters
 
