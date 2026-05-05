@@ -1,0 +1,55 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 59a5d6abbb..7c80acf486 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -1855,6 +1855,27 @@ class SQLUpdateCompiler(SQLCompiler):
+                 idents.extend(r[0] for r in rows)
+             self.query.add_filter("pk__in", idents)
+             self.query.related_ids = idents
++            # For each related update, collect the correct parent link IDs.
++            # When a child model has multiple concrete parents (e.g.,
++            # Child(Base, OtherBase)), the child's PK corresponds to the
++            # first parent. Related updates for other parents need their
++            # own parent link field values, not the child's PK values.
++            for model in self.query.related_updates:
++                ancestor_link = query.get_meta().get_ancestor_link(model)
++                if ancestor_link and ancestor_link != query.get_meta().pk:
++                    # Need to select the parent link field for this model.
++                    parent_query = self.query.chain(klass=Query)
++                    parent_query.select_related = False
++                    parent_query.clear_ordering(force=True)
++                    parent_query.extra = {}
++                    parent_query.select = []
++                    parent_query.add_fields([ancestor_link.attname])
++                    parent_idents = []
++                    for rows in parent_query.get_compiler(
++                        self.using
++                    ).execute_sql(MULTI):
++                        parent_idents.extend(r[0] for r in rows)
++                    self.query.related_ids_per_model[model] = parent_idents
+         else:
+             # The fast path. Filters and updates in one query.
+             self.query.add_filter("pk__in", query)
+diff --git a/django/db/models/sql/subqueries.py b/django/db/models/sql/subqueries.py
+index 04063f73bc..c9a23d91fc 100644
+--- a/django/db/models/sql/subqueries.py
++++ b/django/db/models/sql/subqueries.py
+@@ -61,6 +61,7 @@ class UpdateQuery(Query):
+         """
+         self.values = []
+         self.related_ids = None
++        self.related_ids_per_model = {}
+         self.related_updates = {}
+ 
+     def clone(self):
+@@ -133,7 +134,9 @@ class UpdateQuery(Query):
+         for model, values in self.related_updates.items():
+             query = UpdateQuery(model)
+             query.values = values
+-            if self.related_ids is not None:
++            if model in self.related_ids_per_model:
++                query.add_filter("pk__in", self.related_ids_per_model[model])
++            elif self.related_ids is not None:
+                 query.add_filter("pk__in", self.related_ids)
+             result.append(query)
+         return result

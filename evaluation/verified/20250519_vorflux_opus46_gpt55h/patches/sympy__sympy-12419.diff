@@ -1,0 +1,38 @@
+diff --git a/sympy/concrete/summations.py b/sympy/concrete/summations.py
+index 372487664c..60b11a0aff 100644
+--- a/sympy/concrete/summations.py
++++ b/sympy/concrete/summations.py
+@@ -867,6 +867,16 @@ def eval_sum(f, limits):
+                 newargs.append((newexpr, arg.cond))
+             return f.func(*newargs)
+ 
++        # If the Piecewise is Piecewise((expr, cond), (0, True)) and the
++        # condition is equivalent to the summation range a <= i <= b, then
++        # the Piecewise simplifies to just expr within the summation.
++        if (len(f.args) == 2 and f.args[1].expr is S.Zero
++                and f.args[1].cond == True):
++            from sympy.sets.sets import Interval
++            summation_cond = Interval(a, b).as_relational(i)
++            if f.args[0].cond == summation_cond:
++                return eval_sum(f.args[0].expr, limits)
++
+     if f.has(KroneckerDelta) and _has_simple_delta(f, limits[0]):
+         return deltasummation(f, limits)
+ 
+diff --git a/sympy/matrices/expressions/matexpr.py b/sympy/matrices/expressions/matexpr.py
+index b4d759836e..1cb0cf4df5 100644
+--- a/sympy/matrices/expressions/matexpr.py
++++ b/sympy/matrices/expressions/matexpr.py
+@@ -476,10 +476,8 @@ def conjugate(self):
+         return self
+ 
+     def _entry(self, i, j):
+-        if i == j:
+-            return S.One
+-        else:
+-            return S.Zero
++        from sympy.functions.special.tensor_functions import KroneckerDelta
++        return KroneckerDelta(i, j)
+ 
+     def _eval_determinant(self):
+         return S.One

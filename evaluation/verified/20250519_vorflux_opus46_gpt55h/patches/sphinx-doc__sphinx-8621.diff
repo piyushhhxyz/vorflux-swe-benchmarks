@@ -1,0 +1,55 @@
+diff --git a/sphinx/builders/html/transforms.py b/sphinx/builders/html/transforms.py
+index c91da57e9..34e8116fb 100644
+--- a/sphinx/builders/html/transforms.py
++++ b/sphinx/builders/html/transforms.py
+@@ -46,17 +46,42 @@ class KeyboardTransform(SphinxPostTransform):
+             if len(parts) == 1:
+                 continue
+ 
++            # Reassemble the split parts into (key, separator) pairs.
++            # After re.split with a capturing group, parts alternate:
++            #   [key, sep, key, sep, ..., key]
++            # When a key position is empty, the adjacent separator character
++            # is actually a keystroke, not a separator.  Merge those cases.
++            keys = []
++            # Extract keys (even indices) and separators (odd indices)
++            for i in range(0, len(parts), 2):
++                key = parts[i]
++                if key:
++                    keys.append(key)
++                if i + 1 < len(parts):
++                    sep = parts[i + 1]
++                    keys.append(sep)
++
++            # Now keys is a flat list like ['Shift', '-', '+'] or ['-'].
++            # We need to figure out which entries are real separators vs keystrokes.
++            # A separator character is only a real separator if it has a non-separator
++            # on both sides.  Build the final list of (key, sep) pairs.
++            # Strategy: walk through and collect keystrokes vs separators.
++            result = []
++            for k in keys:
++                if self.pattern.match(k) and result and result[-1][1] is None:
++                    # This looks like a separator and the previous entry needs one
++                    result[-1] = (result[-1][0], k)
++                else:
++                    result.append((k, None))
++
++            if len(result) == 1:
++                continue
++
+             node.pop()
+-            while parts:
+-                key = parts.pop(0)
++            for i, (key, sep) in enumerate(result):
+                 node += nodes.literal('', key, classes=["kbd"])
+-
+-                try:
+-                    # key separator (ex. -, +, ^)
+-                    sep = parts.pop(0)
++                if sep is not None:
+                     node += nodes.Text(sep)
+-                except IndexError:
+-                    pass
+ 
+ 
+ def setup(app: Sphinx) -> Dict[str, Any]:

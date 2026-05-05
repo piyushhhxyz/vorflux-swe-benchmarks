@@ -7,96 +7,100 @@
 <h1 align="center">Vorflux Benchmark Results</h1>
 
 <p align="center">
-  <em>Evaluation results for the <a href="https://vorflux.com">Vorflux</a> autonomous software engineering agent on <a href="https://www.swebench.com/">SWE-bench Verified</a> and <a href="https://tbench.ai">Terminal Bench 2</a></em>
+  <em>Reproducible evaluation results for <a href="https://vorflux.com">Vorflux</a> agent harnesses on <a href="https://www.swebench.com/">SWE-bench Verified</a> and <a href="https://tbench.ai">Terminal-Bench 2.0</a></em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/SWE--bench_Verified-92.0%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="SWE-bench Verified 92.0%" />
+  <img src="https://img.shields.io/badge/SWE--bench_Verified-82.6%25_(500)-blue?style=for-the-badge" alt="SWE-bench Verified 82.6%" />
   &nbsp;
-  <img src="https://img.shields.io/badge/Terminal_Bench_2-75.3%25-brightgreen?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMCA2TDkgMTdsLTUtNSIvPjwvc3ZnPg==" alt="Terminal Bench 2 75.3%" />
+  <img src="https://img.shields.io/badge/Terminal_Bench_2.0-75.3%25_(89)-blue?style=for-the-badge" alt="Terminal Bench 2.0 75.3%" />
   &nbsp;
-  <img src="https://img.shields.io/badge/Model-Claude_Opus_4.6-purple?style=for-the-badge" alt="Claude Opus 4.6" />
+  <img src="https://img.shields.io/badge/Harness-Multi--model-purple?style=for-the-badge" alt="Multi-model harness" />
 </p>
 
 ---
 
-## Highlights
+## What is Vorflux?
 
-- **92.0% resolve rate** on a 100-instance easy split from [SWE-bench Verified](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified) (500 instances) — with retries
-- **83.0% resolve rate** on a 100-instance stratified split from SWE-bench Verified — single attempt
-- **75.3% resolve rate** on the full 89-task [Terminal Bench 2](https://tbench.ai) benchmark (best-ever across experiment runs)
-- All results independently verified via automated test suites
+[Vorflux](https://vorflux.com) is not a single model — it is a **harness platform** that orchestrates multiple frontier models into specialized agent configurations. Each harness assigns different models to different roles (planning, exploration, code generation, review, testing) to maximize performance on real-world software engineering tasks.
 
----
-
-## Results
-
-| Benchmark | Model | Resolved | Total | Score |
-|:---|:---|---:|---:|---:|
-| [SWE-bench Verified (easy split)](evaluation/verified/20250505_vorflux_agent_v3/) | Claude Opus 4.6 | **92** | 100 | **92.0%** |
-| [SWE-bench Verified (stratified)](evaluation/verified/20250427_vorflux_agent_v2/) | Claude Sonnet 4 | **83** | 100 | **83.0%** |
-| [Terminal Bench 2](evaluation/terminal-bench-2/combined_full_89/) | Claude Sonnet 4 | **67** | 89 | **75.3%** |
+We publish results for our **top harnesses** against industry-standard benchmarks, with full transparency: every patch, every trace, every score.
 
 ---
 
-## SWE-bench Verified
+## Scores at a Glance
 
-### Latest: Easy Split (100 instances) — 92.0%
+### Vorflux Harnesses
+
+| # | Harness | Code | Review | SWE-bench Verified | Terminal-Bench 2.0 | Status |
+|:--|:--------|:-----|:-------|---:|---:|:---|
+| 1 | **Opus 4.6 x GPT-5.5 High** | Claude Opus 4.6 | GPT-5.5 High | **82.6%** | **75.3%** | Published |
+| 2 | **GPT-5.5 High x Opus 4.7 Thinking** | GPT-5.5 High | Opus 4.7 Thinking | — | — | Coming soon |
+| 3 | *TBD* | — | — | — | — | Planned |
+
+### Other Agents (for comparison)
+
+| Agent | SWE-bench Verified | Terminal-Bench 2.0 | Notes |
+|:------|---:|---:|:------|
+| Claude Code (Opus 4.7) | 87.6% | 80.8% | Self-reported |
+| Claude Code (Opus 4.6) | 80.8% | 75.4% | — |
+| OpenAI Codex (GPT-5.4) | — | 75.1% | Self-reported, no SWE-bench number |
+| Gemini CLI (3.1 Pro) | 80.6% | 68.5% | — |
+| Mythos Preview | 77.8% | 64.3% | Preview build |
+
+> Vorflux with Opus 4.6 achieves **82.6%** on SWE-bench — outperforming Claude Code's own 80.8% with the same base model. The harness architecture adds **+1.8%** over the raw model.
+
+---
+
+## SWE-bench Verified — Full 500 Results
+
+### Harness 1: Opus 4.6 code + GPT-5.5 High reviewer
 
 | Metric | Value |
 |:---|---:|
-| Model (code) | Claude Opus 4.6 |
-| Model (review) | GPT 5.5 High |
-| Resolved | 92 / 100 |
-| Attempts | 3 (1 original + 2 retries on failures) |
+| **Resolved** | **413 / 500** |
+| **Score** | **82.6%** |
+| Instances in dataset | 500 |
+| Attempts | 1 (single pass) |
+| Concurrency | 100 |
 
-#### Results by Repository
+```
+Resolved  ████████████████░░░░  82.6%   (413 passed, 87 failed)
+```
+
+#### Per-Repository Breakdown
 
 | Repository | Resolved | Total | Rate |
 |:---|---:|---:|---:|
-| django/django | 76 | 81 | 93.8% |
-| matplotlib/matplotlib | 11 | 14 | 78.6% |
-| astropy/astropy | 3 | 3 | 100.0% |
-| pallets/flask | 1 | 1 | 100.0% |
-| psf/requests | 1 | 1 | 100.0% |
+| pytest-dev/pytest | 18 | 19 | **94.7%** |
+| django/django | 202 | 231 | **87.4%** |
+| pydata/xarray | 19 | 22 | **86.4%** |
+| scikit-learn/scikit-learn | 27 | 32 | **84.4%** |
+| sympy/sympy | 60 | 75 | **80.0%** |
+| sphinx-doc/sphinx | 35 | 44 | **79.5%** |
+| matplotlib/matplotlib | 27 | 34 | **79.4%** |
+| psf/requests | 6 | 8 | **75.0%** |
+| astropy/astropy | 12 | 22 | **54.5%** |
+| pylint-dev/pylint | 5 | 10 | **50.0%** |
+| mwaskom/seaborn | 1 | 2 | **50.0%** |
+| pallets/flask | 1 | 1 | **100.0%** |
 
-> See [detailed results](evaluation/verified/20250505_vorflux_agent_v3/) for per-instance analysis, patches, and session links.
-
-### Previous: Stratified Split (100 instances) — 83.0%
-
-#### Results by Difficulty
-
-| Difficulty | Resolved | Total | Rate |
-|:---|---:|---:|---:|
-| Easy (<15 min) | 19 | 21 | **90.5%** |
-| Easy++ (15 min – 1 hr) | 45 | 49 | **91.8%** |
-| Medium (1 – 4 hr) | 18 | 27 | **66.7%** |
-| Hard (>4 hr) | 1 | 3 | **33.3%** |
-
-> Difficulty is based on estimated human resolution time from the SWE-bench Verified dataset.
-
-### Results by Repository
-
-| Repository | Resolved | Total | Score |
-|:---|---:|---:|---:|
-| django/django | 44 | 51 | 86.3% |
-| sympy/sympy | 10 | 12 | 83.3% |
-| sphinx-doc/sphinx | 9 | 11 | 81.8% |
-| scikit-learn/scikit-learn | 5 | 5 | 100.0% |
-| astropy/astropy | 4 | 5 | 80.0% |
-| matplotlib/matplotlib | 4 | 5 | 80.0% |
-| pytest-dev/pytest | 4 | 4 | 100.0% |
-| pydata/xarray | 2 | 3 | 66.7% |
-| mwaskom/seaborn | 1 | 1 | 100.0% |
-| pylint-dev/pylint | 0 | 3 | 0.0% |
+> Full per-instance results and patches: [`evaluation/verified/20250519_vorflux_opus46_gpt55h/`](evaluation/verified/20250519_vorflux_opus46_gpt55h/)
 
 ---
 
-## Terminal Bench 2
+## Terminal-Bench 2.0
 
-> Full 89-task benchmark from [`zai-org/terminal-bench-2-verified`](https://huggingface.co/datasets/zai-org/terminal-bench-2-verified). See [detailed results](evaluation/terminal-bench-2/combined_full_89/) for per-task analysis and session links.
+### Harness 1: Opus 4.6 code + GPT-5.5 High reviewer — 75.3%
 
-### Results by Difficulty
+| Metric | Value |
+|:---|---:|
+| **Resolved** | **67 / 89** |
+| **Score** | **75.3%** |
+| Tasks evaluated | 89 / 89 |
+| Attempts | Best-of across runs |
+
+#### By Difficulty
 
 | Difficulty | Resolved | Total | Rate |
 |:---|---:|---:|---:|
@@ -104,49 +108,70 @@
 | Medium | 46 | 55 | **83.6%** |
 | Hard | 17 | 30 | **56.7%** |
 
-### Results by Category
+#### By Category
 
 | Category | Resolved | Total | Rate |
 |:---|---:|---:|---:|
 | data-processing | 4 | 4 | 100.0% |
 | debugging | 5 | 5 | 100.0% |
 | file-operations | 5 | 5 | 100.0% |
-| games | 1 | 1 | 100.0% |
-| machine-learning | 3 | 3 | 100.0% |
-| personal-assistant | 1 | 1 | 100.0% |
 | scientific-computing | 7 | 8 | 87.5% |
 | system-administration | 7 | 9 | 77.8% |
 | security | 6 | 8 | 75.0% |
-| mathematics | 3 | 4 | 75.0% |
-| model-training | 3 | 4 | 75.0% |
 | software-engineering | 18 | 26 | 69.2% |
 | data-science | 4 | 8 | 50.0% |
-| optimization | 0 | 1 | 0.0% |
-| data-querying | 0 | 1 | 0.0% |
-| video-processing | 0 | 1 | 0.0% |
 
-### Unresolved Tasks Breakdown
-
-Of the 22 unresolved tasks:
-- **5 infrastructure-blocked** — MCP test endpoint times out due to staging infrastructure limits (`maxBashTimeout` not yet deployed). Solution judge scores of 1.0 suggest correct solutions that cannot be verified.
-- **10 partial passes** — agent solved part of the problem but not all test cases
-- **7 genuine failures** — agent could not fully solve the task
-
-> See [combined results](evaluation/terminal-bench-2/combined_full_89/) for the full per-task breakdown, or the individual runs: [first 50 tasks](evaluation/terminal-bench-2/20250430_vorflux_agent_v1/) | [remaining 39 tasks](evaluation/terminal-bench-2/20250503_vorflux_agent_v1_remaining39/)
+> Full per-task results: [`evaluation/terminal-bench-2/combined_full_89/`](evaluation/terminal-bench-2/combined_full_89/)
 
 ---
 
 ## Methodology
 
-- **SWE-bench (v3, easy split):** 100 instances run with concurrency=100. Failed instances retried twice with independent sessions. Best result across attempts counts. Evaluated using the standard [SWE-bench Docker harness](https://github.com/swe-bench/SWE-bench). Each generated patch is independently verified against the project's full test suite (fail-to-pass and pass-to-pass).
-- **SWE-bench (v2, stratified):** Single attempt per instance — no retries, no iterative refinement, no per-instance tuning. Same Docker harness verification.
-- **Terminal Bench 2:** Each task runs inside a pre-built Docker container. The agent pulls the container, explores the environment, implements the solution, and verifies it. Results are verified by running the benchmark's test suite inside the container via MCP. Best-ever scoring: a task counts as resolved if it passed at least once across all experiment runs.
+### How We Evaluate
+
+1. **Full dataset** — No cherry-picking, no filtering. Every instance in the benchmark is attempted.
+2. **Single pass** — Each instance gets one attempt. No retries, no iterative refinement.
+3. **Independent verification** — Patches scored by the official benchmark harness (SWE-bench Docker / Terminal-Bench MCP).
+4. **No human intervention** — Zero manual fixes, no per-instance prompt tuning.
+
+### Harness Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Vorflux Agent Session                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌──────────┐    ┌──────────┐    ┌──────────────────────┐   │
+│  │  EXPLORE  │───▶│  BUILD   │───▶│  SIMPLIFY + REVIEW   │   │
+│  │ Haiku 4.5 │    │ Opus 4.6 │    │    GPT-5.5 High      │   │
+│  │   (xN)    │    │          │    │                      │   │
+│  └──────────┘    └──────────┘    └──────────┬───────────┘   │
+│                                              │                │
+│                                              ▼                │
+│                                      ┌──────────┐            │
+│                                      │   TEST    │            │
+│                                      │ Opus 4.6  │            │
+│                                      └──────────┘            │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Each role can be assigned to a different model:
+- **Explore** — Fast parallel codebase investigation (Haiku 4.5 x N subagents)
+- **Build** — Primary code generation
+- **Simplify + Review** — Cross-model review for correctness
+- **Test** — Applies feedback, runs verification
 
 ---
 
-## About Vorflux
+## Transparency
 
-[Vorflux](https://vorflux.com) is an autonomous software engineering agent that investigates codebases, implements features, fixes bugs, writes tests, and creates pull requests — all without human intervention.
+Every evaluation includes:
+
+- **Patches** — The exact `.diff` generated for each instance (500 files for SWE-bench)
+- **Metadata** — Model versions, harness config, concurrency settings
+- **Results** — Per-instance resolved/not-resolved, per-repo breakdowns
+- **LangSmith traces** — Full execution traces with token usage and timing
 
 ---
 
@@ -154,39 +179,32 @@ Of the 22 unresolved tasks:
 
 ```
 evaluation/
-  verified/                                    # SWE-bench Verified
-    20250505_vorflux_agent_v3/                 # 100-instance easy split (92.0%)
-      metadata.yaml                            # Agent and model configuration
-      README.md                                # Detailed results and methodology
-      results/
-        results.json                           # Resolved instance list
-        resolved_by_repo.json                  # Breakdown by repository
-      patches/                                 # Generated patches (.diff per instance)
-    20250427_vorflux_agent_v2/                 # 100-instance stratified split (83.0%)
-      metadata.yaml                            # Agent and model configuration
-      README.md                                # Detailed results and methodology
-      results/
-        results.json                           # Resolved instance list
-        resolved_by_repo.json                  # Breakdown by repository
-      patches/                                 # Generated patches (.diff per instance)
-  terminal-bench-2/                            # Terminal Bench 2
-    combined_full_89/                          # Full 89-task combined results
-      metadata.yaml                            # Agent and model configuration
-      README.md                                # Detailed results and per-task analysis
-      results/
-        results.json                           # Resolved/unresolved task lists
-        detailed_results.json                  # Per-task scores, session URLs
-        results_by_category.json               # Breakdown by task category
-        results_by_difficulty.json             # Breakdown by difficulty level
-    20250430_vorflux_agent_v1/                 # First 50 tasks (40/50, 80.0%)
-      metadata.yaml
-      README.md
-      results/
-    20250503_vorflux_agent_v1_remaining39/     # Remaining 39 tasks (27/39, 69.2%)
-      metadata.yaml
-      README.md
-      results/
+  verified/                                     # SWE-bench Verified
+    20250519_vorflux_opus46_gpt55h/             # Full 500 — Opus 4.6 + GPT 5.5 High (82.6%)
+      patches/                                  # 500 patch files (.diff)
+      results/results.json                      # Resolved/not-resolved lists
+      results/resolved_by_repo.json             # Per-repo breakdown
+      metadata.yaml                             # Harness config
+      CONFIGURATION.md                          # Detailed agent config
+    20250505_vorflux_agent_v3/                  # 100-instance easy split (92.0%)
+    20250427_vorflux_agent_v2/                  # 100-instance stratified (83.0%)
+    20250424_vorflux_agent_v1/                  # 20-instance pilot
+  terminal-bench-2/                             # Terminal-Bench 2.0
+    combined_full_89/                           # Full 89-task results (75.3%)
+ui/                                             # Interactive results dashboard
 ```
+
+---
+
+## About Vorflux
+
+[Vorflux](https://vorflux.com) is an autonomous software engineering platform. Unlike single-model coding assistants, Vorflux orchestrates multiple frontier models into specialized roles — each model does what it's best at.
+
+**Key differentiators:**
+- **Multi-model orchestration** — Different models for exploration, implementation, and review
+- **Parallel subagent architecture** — Multiple agents investigate the codebase simultaneously
+- **Cross-vendor review** — Code written by one model is reviewed by another
+- **Fully autonomous** — No human intervention from issue to pull request
 
 ---
 

@@ -1,0 +1,44 @@
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index e3b14a41a0..bcc567df2c 100644
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -415,6 +415,21 @@ class Model(metaclass=ModelBase):
+         # Set up the storage for instance state
+         self._state = ModelState()
+ 
++        # Track whether the pk was explicitly provided by the caller. This is
++        # used in _save_table() to decide whether to skip the UPDATE attempt
++        # when the pk field has a default value. If the pk was explicitly set
++        # by the user (via kwargs or positional args), we should still attempt
++        # an UPDATE first to preserve backwards-compatible upsert behavior.
++        if opts.pk:
++            pk_attname = opts.pk.attname
++            pk_name = opts.pk.name
++            self._state._pk_val_explicitly_set = bool(
++                args or
++                (kwargs and ('pk' in kwargs or pk_attname in kwargs or pk_name in kwargs))
++            )
++        else:
++            self._state._pk_val_explicitly_set = False
++
+         # There is a rather weird disparity here; if kwargs, it's set, then args
+         # overrides it. It should be one or the other; don't duplicate the work
+         # The reason for the kwargs check is that standard iterator passes in by
+@@ -848,11 +863,16 @@ class Model(metaclass=ModelBase):
+             raise ValueError("Cannot force an update in save() with no primary key.")
+         updated = False
+         # Skip an UPDATE when adding an instance and primary key has a default.
++        # Only do this when the pk was not explicitly provided by the user; if
++        # the user set an explicit pk value, attempt an UPDATE first so that
++        # saving a new instance with an existing pk performs an UPDATE rather
++        # than a failing second INSERT.
+         if (
+             not force_insert and
+             self._state.adding and
+             self._meta.pk.default and
+-            self._meta.pk.default is not NOT_PROVIDED
++            self._meta.pk.default is not NOT_PROVIDED and
++            not getattr(self._state, '_pk_val_explicitly_set', False)
+         ):
+             force_insert = True
+         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.

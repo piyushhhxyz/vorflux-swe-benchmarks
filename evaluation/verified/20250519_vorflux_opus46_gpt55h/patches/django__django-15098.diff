@@ -1,0 +1,31 @@
+diff --git a/django/utils/translation/trans_real.py b/django/utils/translation/trans_real.py
+index 7dcc77b46c..f51ed3df82 100644
+--- a/django/utils/translation/trans_real.py
++++ b/django/utils/translation/trans_real.py
+@@ -43,7 +43,7 @@ language_code_re = _lazy_re_compile(
+     re.IGNORECASE
+ )
+ 
+-language_code_prefix_re = _lazy_re_compile(r'^/(\w+([@-]\w+)?)(/|$)')
++language_code_prefix_re = _lazy_re_compile(r'^/(\w+([@-]\w+)*)(/|$)')
+ 
+ 
+ @receiver(setting_changed)
+@@ -510,9 +510,16 @@ def get_language_from_path(path, strict=False):
+         return None
+     lang_code = regex_match[1]
+     try:
+-        return get_supported_language_variant(lang_code, strict=strict)
++        lang = get_supported_language_variant(lang_code, strict=strict)
+     except LookupError:
+         return None
++    # If the matched code was resolved to a shorter variant via fallback,
++    # verify the fallback didn't strip more than one subtag level. This
++    # prevents URL slugs like /de-simple-page/ from being misinterpreted
++    # as language 'de' through aggressive subtag truncation.
++    if (lang_code.count('-') - lang.count('-')) > 1:
++        return None
++    return lang
+ 
+ 
+ def get_language_from_request(request, check_path=False):

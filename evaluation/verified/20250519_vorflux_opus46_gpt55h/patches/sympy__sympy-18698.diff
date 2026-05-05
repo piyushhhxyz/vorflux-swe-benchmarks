@@ -1,0 +1,30 @@
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index c9e77a901f..21e975b57a 100644
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -5901,6 +5901,25 @@ def _symbolic_factor_list(expr, opt, method):
+ 
+     args = [i._eval_factor() if hasattr(i, '_eval_factor') else i
+         for i in Mul.make_args(expr)]
++
++    # For sqf, combine bases of Pow args that share the same exponent
++    # so that the square-free decomposition processes them as a single
++    # polynomial.  E.g. (x-2)**3 * (x-3)**3 becomes ((x-2)*(x-3))**3.
++    if method == 'sqf':
++        from collections import defaultdict
++        pow_groups = defaultdict(list)
++        other_args = []
++        for arg in args:
++            if arg.is_Pow:
++                base, exp = arg.args
++                if exp.is_Integer and exp is not S.One:
++                    pow_groups[exp].append(base)
++                    continue
++            other_args.append(arg)
++        args = other_args
++        for exp, bases in pow_groups.items():
++            args.append(Mul(*bases).expand()**exp)
++
+     for arg in args:
+         if arg.is_Number:
+             coeff *= arg

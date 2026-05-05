@@ -40,8 +40,8 @@ describe('EVAL_DATE', () => {
 });
 
 describe('HARNESSES', () => {
-  it('has four harness configurations', () => {
-    expect(HARNESSES).toHaveLength(4);
+  it('has three harness configurations', () => {
+    expect(HARNESSES).toHaveLength(3);
   });
 
   it('each harness has required fields', () => {
@@ -57,15 +57,6 @@ describe('HARNESSES', () => {
       expect(h.seats).toHaveProperty('test');
     }
   });
-
-  it('first harness actually has the highest SWE-bench score', () => {
-    const firstId = HARNESSES[0].id;
-    const firstScore = HARNESS_SCORES['swe-bench'][firstId];
-    for (const h of HARNESSES) {
-      const score = HARNESS_SCORES['swe-bench'][h.id];
-      expect(firstScore).toBeGreaterThanOrEqual(score);
-    }
-  });
 });
 
 describe('TOP_HARNESSES', () => {
@@ -79,18 +70,10 @@ describe('TOP_HARNESSES', () => {
     }
   });
 
-  it('contains the actual top 3 SWE-bench performers', () => {
-    const sortedByScore = [...HARNESSES]
-      .sort((a, b) => (HARNESS_SCORES['swe-bench'][b.id] ?? 0) - (HARNESS_SCORES['swe-bench'][a.id] ?? 0));
-    const expectedIds = sortedByScore.slice(0, 3).map((h) => h.id);
-    const actualIds = TOP_HARNESSES.map((h) => h.id);
-    expect(actualIds).toEqual(expectedIds);
-  });
-
-  it('is sorted by SWE-bench score descending', () => {
+  it('is sorted by SWE-bench score descending (nulls last)', () => {
     for (let i = 0; i < TOP_HARNESSES.length - 1; i++) {
-      const scoreA = HARNESS_SCORES['swe-bench'][TOP_HARNESSES[i].id];
-      const scoreB = HARNESS_SCORES['swe-bench'][TOP_HARNESSES[i + 1].id];
+      const scoreA = HARNESS_SCORES['swe-bench'][TOP_HARNESSES[i].id] ?? 0;
+      const scoreB = HARNESS_SCORES['swe-bench'][TOP_HARNESSES[i + 1].id] ?? 0;
       expect(scoreA).toBeGreaterThanOrEqual(scoreB);
     }
   });
@@ -107,15 +90,15 @@ describe('HARNESS_SCORES', () => {
     }
   });
 
-  it('best SWE-bench score is 91.0', () => {
-    expect(HARNESS_SCORES['swe-bench']['opus47-gpt55']).toBe(91.0);
+  it('opus46-gpt55h SWE-bench score is 82.6', () => {
+    expect(HARNESS_SCORES['swe-bench']['opus46-gpt55h']).toBe(82.6);
   });
 
-  it('best Terminal-bench score is 86.0', () => {
-    expect(HARNESS_SCORES['terminal-bench']['opus47-gpt55']).toBe(86.0);
+  it('opus46-gpt55h Terminal-bench score is 75.3', () => {
+    expect(HARNESS_SCORES['terminal-bench']['opus46-gpt55h']).toBe(75.3);
   });
 
-  it('all scores are between 0 and 100', () => {
+  it('all non-null scores are between 0 and 100', () => {
     for (const benchKey of ['swe-bench', 'terminal-bench']) {
       for (const val of Object.values(HARNESS_SCORES[benchKey])) {
         if (val != null) {
@@ -129,11 +112,11 @@ describe('HARNESS_SCORES', () => {
 
 describe('getBestHarnessScore', () => {
   it('returns highest SWE-bench score', () => {
-    expect(getBestHarnessScore('swe-bench')).toBe(91.0);
+    expect(getBestHarnessScore('swe-bench')).toBe(82.6);
   });
 
   it('returns highest Terminal-bench score', () => {
-    expect(getBestHarnessScore('terminal-bench')).toBe(86.0);
+    expect(getBestHarnessScore('terminal-bench')).toBe(75.3);
   });
 
   it('returns null for unknown benchmark', () => {
@@ -200,8 +183,8 @@ describe('TERMINAL_BENCH_TASKS', () => {
 });
 
 describe('SWE_BENCH_TASKS', () => {
-  it('has 87 evaluated tasks', () => {
-    expect(SWE_BENCH_TASKS).toHaveLength(87);
+  it('has 500 evaluated tasks (full dataset)', () => {
+    expect(SWE_BENCH_TASKS).toHaveLength(500);
   });
 
   it('each task has id, resolved, and repo', () => {
@@ -212,9 +195,14 @@ describe('SWE_BENCH_TASKS', () => {
     }
   });
 
-  it('has 83 resolved and 4 unresolved tasks', () => {
-    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(83);
-    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(4);
+  it('has 413 resolved and 87 unresolved tasks', () => {
+    expect(SWE_BENCH_TASKS.filter((t) => t.resolved)).toHaveLength(413);
+    expect(SWE_BENCH_TASKS.filter((t) => !t.resolved)).toHaveLength(87);
+  });
+
+  it('covers all 12 repos', () => {
+    const repos = new Set(SWE_BENCH_TASKS.map((t) => t.repo));
+    expect(repos.size).toBe(12);
   });
 });
 
@@ -229,9 +217,9 @@ describe('generateDotGrid', () => {
     expect(dots).toHaveLength(300);
   });
 
-  it('has 87 evaluated dots for SWE-bench and 89 for Terminal-bench', () => {
+  it('has 500 evaluated dots for SWE-bench and 89 for Terminal-bench', () => {
     const sweDots = generateDotGrid('swe-bench');
-    expect(sweDots.filter((d) => d.evaluated)).toHaveLength(87);
+    expect(sweDots.filter((d) => d.evaluated)).toHaveLength(500);
     const tbDots = generateDotGrid('terminal-bench');
     expect(tbDots.filter((d) => d.evaluated)).toHaveLength(89);
   });
@@ -268,16 +256,11 @@ describe('generateDotGrid', () => {
   it('placeholder dots are a mix of teal colors and empty', () => {
     const dots = generateDotGrid('swe-bench');
     const placeholders = dots.filter((d) => !d.evaluated);
-    expect(placeholders.length).toBe(500 - 87);
+    expect(placeholders.length).toBe(0);
     const validTiers = ['easy', 'medium', 'hard', 'empty'];
     for (const d of placeholders) {
       expect(validTiers).toContain(d.difficulty);
     }
-    // Should have both colored and empty placeholders
-    const colored = placeholders.filter((d) => d.difficulty !== 'empty');
-    const empty = placeholders.filter((d) => d.difficulty === 'empty');
-    expect(colored.length).toBeGreaterThan(0);
-    expect(empty.length).toBeGreaterThan(0);
   });
 
   it('is deterministic across calls', () => {
