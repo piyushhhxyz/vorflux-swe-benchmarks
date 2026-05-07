@@ -18,6 +18,10 @@
   <img src="https://img.shields.io/badge/Harness-Multi--model-purple?style=for-the-badge" alt="Multi-model harness" />
 </p>
 
+<p align="center">
+  <strong>Last Updated:</strong> May 07, 2026
+</p>
+
 ---
 
 ## What is Vorflux?
