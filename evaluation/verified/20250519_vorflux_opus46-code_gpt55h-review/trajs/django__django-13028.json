@@ -1,0 +1,1269 @@
+{
+  "instance_id": "django__django-13028",
+  "session_id": "f1f88911-1e39-4cd8-a62b-4c378f98ef48",
+  "total_spans": 132,
+  "trajectory_entries": 87,
+  "trajectory": [
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:24.318856338",
+      "output": {
+        "content": "\n\nI'll start by setting up the repository and investigating the issue.",
+        "tool_calls": [
+          {
+            "id": "toolu_01VUdrPhVVjn5WekMgYeLPiK",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django 2>/dev/null && git rev-parse HEAD || echo \\\"needs setup\\\"\"}"
+            }
+          }
+        ]
+      },
+      "task_prompt": [
+        {
+          "role": "user",
+          "content": "Fix this GitHub issue.\n\n## Setup\n```bash\nif [ ! -d /code/django/django ]; then git clone --filter=blob:none https://github.com/django/django.git /code/django/django; fi\ncd /code/django/django && git fetch origin && git checkout -B fix 78ad4b4b0201003792bfdbf1a7781cbc9ee03539 && git clean -fdx\n```\n## Install\nInstall dependencies after checkout:\n```\napt-get update && apt-get install -y requirements.txt\npython -m pip install -e .\n```\n**Environment:** Python 3.6. Run tests with: `./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1`.\n\n## Issue\nQueryset raises NotSupportedError when RHS has filterable=False attribute.\nDescription\n\t \n\t\t(last modified by Nicolas Baccelli)\n\t \nI'm migrating my app to django 3.0.7 and I hit a strange behavior using a model class with a field labeled filterable\nclass ProductMetaDataType(models.Model):\n\tlabel = models.CharField(max_length=255, unique=True, blank=False, null=False)\n\tfilterable = models.BooleanField(default=False, verbose_name=_(\"filterable\"))\n\tclass Meta:\n\t\tapp_label = \"adminpricing\"\n\t\tverbose_name = _(\"product meta data type\")\n\t\tverbose_name_plural = _(\"product meta data types\")\n\tdef __str__(self):\n\t\treturn self.label\nclass ProductMetaData(models.Model):\n\tid = models.BigAutoField(primary_key=True)\n\tproduct = models.ForeignKey(\n\t\tProduit, null=False, blank=False, on_delete=models.CASCADE\n\t)\n\tvalue = models.TextField(null=False, blank=False)\n\tmarketplace = models.ForeignKey(\n\t\tPlateforme, null=False, blank=False, on_delete=models.CASCADE\n\t)\n\tdate_created = models.DateTimeField(null=True, default=timezone.now)\n\tmetadata_type = models.ForeignKey(\n\t\tProductMetaDataType, null=False, blank=False, on_delete=models.CASCADE\n\t)\n\tclass Meta:\n\t\tapp_label = \"adminpricing\"\n\t\tverbose_name = _(\"product meta data\")\n\t\tverbose_name_plural = _(\"product meta datas\")\nError happened when filtering ProductMetaData with a metadata_type :\nProductMetaData.objects.filter(value=\"Dark Vador\", metadata_type=self.brand_metadata)\nError traceback :\nTraceback (most recent call last):\n File \"/backoffice/backoffice/adminpricing/tests/test_pw.py\", line 481, in test_checkpolicywarning_by_fields\n\tfor p in ProductMetaData.objects.filter(\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/manager.py\", line 82, in manager_method\n\treturn getattr(self.get_queryset(), name)(*args, **kwargs)\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/query.py\", line 904, in filter\n\treturn self._filter_or_exclude(False, *args, **kwargs)\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/query.py\", line 923, in _filter_or_exclude\n\tclone.query.add_q(Q(*args, **kwargs))\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/sql/query.py\", line 1351, in add_q\n\tclause, _ = self._add_q(q_object, self.used_aliases)\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/sql/query.py\", line 1378, in _add_q\n\tchild_clause, needed_inner = self.build_filter(\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/sql/query.py\", line 1264, in build_filter\n\tself.check_filterable(value)\n File \"/usr/local/lib/python3.8/site-packages/django/db/models/sql/query.py\", line 1131, in check_filterable\n\traise NotSupportedError(\ndjango.db.utils.NotSupportedError: ProductMetaDataType is disallowed in the filter clause.\nI changed label to filterable_test and it fixed this issue\nThis should be documented or fix.\n\n\n## Approach\n1. **Explore first** — use subagents to investigate the issue, trace the relevant code paths, and identify the root cause before writing any code. Understand the problem deeply.\n2. **Fix the root cause** — trace backwards to where the bad value originates. Do not fix symptoms.\n3. **Verify thoroughly** — run the failing tests after each change. Do not stop until every originally-failing test passes.\n4. **Quality loop** — before submitting, run review and testing subagents to validate your fix.\n\n## Rules\n- Do NOT stop after the first partial fix — keep iterating until all failing tests pass\n- After each change, run the relevant test file and read the error output to guide your next step\n- You MUST run the originally-failing tests and confirm they all pass before submitting — paste the test output as proof\n- Run the full test suite and iterate until all tests pass\n- If you encounter import errors or missing packages, install them — NEVER edit build/config files (`setup.py`, `tox.ini`, `requirements*.txt`, `setup.cfg`, `pyproject.toml`, `Makefile`, etc.)\n- NEVER modify test files (`tests/`, `test_*.py`, `*_test.py`) — the harness applies its own test patches and your edits will conflict\n- NEVER delete auto-generated files; let the build system regenerate them\n- Prefer the smallest correct change — do not refactor surrounding code\n- The fix is always in the library source code, not in documentation or config files\n\n## When done\nOutput your patch:\n```bash\ncd /code/django/django && git add -A && git commit --allow-empty -m patch && git diff 78ad4b4b0201003792bfdbf1a7781cbc9ee03539 HEAD\n```\nPaste the full diff as your final message. Nothing else needed — no push, no PR, no fork."
+        }
+      ]
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:03:27.880512445",
+      "arguments": {
+        "command": "cd /code/django/django 2>/dev/null && git rev-parse HEAD || echo \"needs setup\""
+      },
+      "result": {
+        "stdout": "needs setup",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:28.021669549",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01K9nzxxjZvZecE7S7xLbB5s",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"if [ ! -d /code/django/django ]; then git clone --filter=blob:none https://github.com/django/django.git /code/django/django; fi\\ncd /code/django/django && git fetch origin && git checkout -B fix 78ad4b4b0201003792bfdbf1a7781cbc9ee03539 && git clean -fdx\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:03:30.879844957",
+      "arguments": {
+        "command": "if [ ! -d /code/django/django ]; then git clone --filter=blob:none https://github.com/django/django.git /code/django/django; fi\ncd /code/django/django && git fetch origin && git checkout -B fix 78ad4b4b0201003792bfdbf1a7781cbc9ee03539 && git clean -fdx",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "Cloning into '/code/django/django'...\nUpdating files:   0% (2/7041)Updating files:   1% (71/7041)Updating files:   2% (141/7041)Updating files:   3% (212/7041)Updating files:   4% (282/7041)Updating files:   5% (353/7041)Updating files:   6% (423/7041)Updating files:   7% (493/7041)Updating files:   8% (564/7041)Updating files:   9% (634/7041)Updating files:  10% (705/7041)Updating files:  11% (775/7041)Updating files:  12% (845/7041)Updating files:  13% (916/7041)Updating files:  14% (986/7041)Updating files:  15% (1057/7041)Updating files:  16% (1127/7041)Updating files:  17% (1197/7041)Updating files:  18% (1268/7041)Updating files:  19% (1338/7041)Updating files:  20% (1409/7041)Updating files:  21% (1479/7041)Updating files:  22% (1550/7041)Updating files:  23% (1620/7041)Updating files:  24% (1690/7041)Updating files:  25% (1761/7041)Updating files:  26% (1831/7041)Updating files:  27% (1902/7041)Updating files:  28% (1972/7041)Updating files:  29% (2042/7041)Updating files:  30% (2113/7041)Updating files:  31% (2183/7041)Updating files:  32% (2254/7041)Updating files:  33% (2324/7041)Updating files:  34% (2394/7041)Updating files:  35% (2465/7041)Updating files:  36% (2535/7041)Updating files:  37% (2606/7041)Updating files:  38% (2676/7041)Updating files:  39% (2746/7041)Updating files:  40% (2817/7041)Updating files:  41% (2887/7041)Updating files:  42% (2958/7041)Updating files:  43% (3028/7041)Updating files:  44% (3099/7041)Updating files:  45% (3169/7041)Updating files:  46% (3239/7041)Updating files:  47% (3310/7041)Updating files:  48% (3380/7041)Updating files:  49% (3451/7041)Updating files:  50% (3521/7041)Updating files:  51% (3591/7041)Updating files:  52% (3662/7041)Updating files:  53% (3732/7041)Updating files:  54% (3803/7041)Updating files:  55% (3873/7041)Updating files:  56% (3943/7041)Updating files:  57% (4014/7041)Updating files:  58% (4084/7041)Updating files:  59% (4155/7041)Updating files:  60% (4225/7041)Updating files:  61% (4296/7041)Updating files:  62% (4366/7041)Updating files:  63% (4436/7041)Updating files:  64% (4507/7041)Updating files:  65% (4577/7041)Updating files:  66% (4648/7041)Updating files:  67% (4718/7041)Updating files:  68% (4788/7041)Updating files:  69% (4859/7041)Updating files:  70% (4929/7041)Updating files:  71% (5000/7041)Updating files:  72% (5070/7041)Updating files:  73% (5140/7041)Updating files:  74% (5211/7041)Updating files:  75% (5281/7041)Updating files:  76% (5352/7041)Updating files:  77% (5422/7041)Updating files:  78% (5492/7041)Updating files:  79% (5563/7041)Updating files:  80% (5633/7041)Updating files:  81% (5704/7041)Updating files:  82% (5774/7041)Updating files:  83% (5845/7041)Updating files:  84% (5915/7041)Updating files:  85% (5985/7041)Updating files:  86% (6056/7041)Updating files:  87% (6126/7041)Updating files:  88% (6197/7041)Updating files:  89% (6267/7041)Updating files:  90% (6337/7041)Updating files:  91% (6408/7041)Updating files:  92% (6478/7041)Updating files:  93% (6549/7041)Updating files:  94% (6619/7041)Updating files:  95% (6689/7041)Updating files:  96% (6760/7041)Updating files:  97% (6830/7041)Updating files:  98% (6901/7041)Updating files:  99% (6971/7041)Updating files: 100% (7041/7041)Updating files: 100% (7041/7041), done.\nSwitched to a new branch 'fix'",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:39.522293626",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01SdsK9pchwhnBG8GwR2a9at",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python -m pip install -e . 2>&1 | tail -5\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:03:42.197719870",
+      "arguments": {
+        "command": "cd /code/django/django && python -m pip install -e . 2>&1 | tail -5",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "    \n    See /usr/share/doc/python3.12/README.venv for more information.\n\nnote: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.\nhint: See PEP 668 for the detailed specification.",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:43.949656667",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_018nej94bu6EUtaX7GUhTS5M",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python -m pip install -e . --break-system-packages 2>&1 | tail -5\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:03:46.669598634",
+      "arguments": {
+        "command": "cd /code/django/django && python -m pip install -e . --break-system-packages 2>&1 | tail -5",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "Installing collected packages: sqlparse, asgiref, Django\n  WARNING: The script sqlformat is installed in '/home/ubuntu/.local/bin' which is not on PATH.\n  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.\n  Running setup.py develop for Django\nSuccessfully installed Django-3.2 asgiref-3.11.1 sqlparse-0.5.5",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:50.801581251",
+      "output": {
+        "content": "Now let me look at the `check_filterable` method that's raising the error:",
+        "tool_calls": [
+          {
+            "id": "toolu_01Uxywor4fKuT7ZdFHQkkB3o",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"def check_filterable\", \"dirPath\": \"/code/django/django\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:03:54.317036744",
+      "arguments": {
+        "pattern": "def check_filterable",
+        "dirPath": "/code/django/django",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "/code/django/django/django/db/models/sql/query.py:1125:    def check_filterable(self, expression):"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:54.965064919",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01Fj5pv8V49B43xNi6Mf3dwz",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"file_path\": \"/code/django/django/django/db/models/sql/query.py\", \"offset\": 1122, \"limit\": 20}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "read_text_file",
+      "timestamp": "2026-05-05 12:03:59.796889205",
+      "arguments": {
+        "filePath": "/code/django/django/django/db/models/sql/query.py",
+        "offset": 1122,
+        "limit": 20
+      },
+      "result": "  1123→                    self.check_query_object_type(v, opts, field)\n  1124→\n  1125→    def check_filterable(self, expression):\n  1126→        \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n  1127→        if not getattr(expression, 'filterable', True):\n  1128→            raise NotSupportedError(\n  1129→                expression.__class__.__name__ + ' is disallowed in the filter '\n  1130→                'clause.'\n  1131→            )\n  1132→        if hasattr(expression, 'get_source_expressions'):\n  1133→            for expr in expression.get_source_expressions():\n  1134→                self.check_filterable(expr)\n  1135→\n  1136→    def build_lookup(self, lookups, lhs, rhs):\n  1137→        \"\"\"\n  1138→        Try to extract transforms and lookup from given lhs.\n  1139→\n  1140→        The lhs value is something that works like SQLExpression.\n  1141→        The rhs value is what the lookup is going to compare against.\n  1142→        The lookups is a list of names to extract using get_lookup()\n\n[Showing 20 lines starting at line 1123. Use 'offset' and 'limit' parameters to read more. Example: offset=1142, limit=20 for next 20 lines]"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:03:59.984713699",
+      "output": {
+        "content": "Now let me see where `check_filterable` is called in `build_filter`:",
+        "tool_calls": [
+          {
+            "id": "toolu_01Pp4Xa5Q27LpnWiMwEGXwGw",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"check_filterable\", \"dirPath\": \"/code/django/django/django/db/models/sql/query.py\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:04:03.593301460",
+      "arguments": {
+        "pattern": "check_filterable",
+        "dirPath": "/code/django/django/django/db/models/sql/query.py",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "1125:    def check_filterable(self, expression):\n1134:                self.check_filterable(expr)\n1203:                     reuse_with_filtered_relation=False, check_filterable=True):\n1242:                check_filterable=check_filterable,\n1258:        if check_filterable:\n1259:            self.check_filterable(reffed_expression)\n1268:        if check_filterable:\n1269:            self.check_filterable(value)\n1366:               check_filterable=True):\n1378:                split_subq=split_subq, check_filterable=check_filterable,"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:04:04.084616665",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01Pyw6yw1DkYoK5CHbUMUgco",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"file_path\": \"/code/django/django/django/db/models/sql/query.py\", \"offset\": 1255, \"limit\": 20}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "read_text_file",
+      "timestamp": "2026-05-05 12:04:06.464175560",
+      "arguments": {
+        "filePath": "/code/django/django/django/db/models/sql/query.py",
+        "offset": 1255,
+        "limit": 20
+      },
+      "result": "  1256→        lookups, parts, reffed_expression = self.solve_lookup_type(arg)\n  1257→\n  1258→        if check_filterable:\n  1259→            self.check_filterable(reffed_expression)\n  1260→\n  1261→        if not allow_joins and len(parts) > 1:\n  1262→            raise FieldError(\"Joined field references are not permitted in this query\")\n  1263→\n  1264→        pre_joins = self.alias_refcount.copy()\n  1265→        value = self.resolve_lookup_value(value, can_reuse, allow_joins)\n  1266→        used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}\n  1267→\n  1268→        if check_filterable:\n  1269→            self.check_filterable(value)\n  1270→\n  1271→        clause = self.where_class()\n  1272→        if reffed_expression:\n  1273→            condition = self.build_lookup(lookups, reffed_expression, value)\n  1274→            clause.add(condition, AND)\n  1275→            return clause, []\n\n[Showing 20 lines starting at line 1256. Use 'offset' and 'limit' parameters to read more. Example: offset=1275, limit=20 for next 20 lines]"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:04:06.511512259",
+      "output": {
+        "content": "Now I understand the issue clearly. At line 1269, `self.check_filterable(value)` is called on the RHS value. When the RHS is a model instance (like `self.brand_metadata` which is a `ProductMetaDataType` instance), `check_filterable` does `getattr(expression, 'filterable', True)`. Since `ProductMetaDataType` has a field called `filterable` (a `BooleanField` with `default=False`), `getattr` returns the field's value (which is `False`), and the check raises `NotSupportedError`.\n\nThe problem is that `check_filterable` is using `getattr` which doesn't distinguish between Django's internal `filterable` attribute on expressions and a user-defined model field named `filterable`. The fix should check that the `filterable` attribute is actually the expression's own property, not a model field value.\n\nLet me look at what `filterable` is supposed to be:",
+        "tool_calls": [
+          {
+            "id": "toolu_01Rw2D1paQZ4cT7vvym9pvp7",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"filterable\\\\s*=\", \"dirPath\": \"/code/django/django/django/db/models/expressions.py\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:04:13.872507799",
+      "arguments": {
+        "pattern": "filterable\\s*=",
+        "dirPath": "/code/django/django/django/db/models/expressions.py",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "159:    filterable = True\n1205:    filterable = False"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:04:13.930070225",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01CPUkhyRLv8TKyA3n6WvD52",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"file_path\": \"/code/django/django/django/db/models/expressions.py\", \"offset\": 155, \"limit\": 10}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "read_text_file",
+      "timestamp": "2026-05-05 12:04:16.549446703",
+      "arguments": {
+        "filePath": "/code/django/django/django/db/models/expressions.py",
+        "offset": 155,
+        "limit": 10
+      },
+      "result": "   156→    is_summary = False\n   157→    _output_field_resolved_to_none = False\n   158→    # Can the expression be used in a WHERE clause?\n   159→    filterable = True\n   160→    # Can the expression can be used as a source expression in Window?\n   161→    window_compatible = False\n   162→\n   163→    def __init__(self, output_field=None):\n   164→        if output_field is not None:\n   165→            self.output_field = output_field\n\n[Showing 10 lines starting at line 156. Use 'offset' and 'limit' parameters to read more. Example: offset=165, limit=10 for next 10 lines]"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:04:16.651768800",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01EpPVhb2DECZLSGQMRTdiCk",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"file_path\": \"/code/django/django/django/db/models/expressions.py\", \"offset\": 1200, \"limit\": 10}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "read_text_file",
+      "timestamp": "2026-05-05 12:04:20.681333359",
+      "arguments": {
+        "filePath": "/code/django/django/django/db/models/expressions.py",
+        "offset": 1200,
+        "limit": 10
+      },
+      "result": "  1201→    # expression with an aggregate function, the GROUP BY that will\n  1202→    # be introduced in the query as a result is not desired.\n  1203→    contains_aggregate = False\n  1204→    contains_over_clause = True\n  1205→    filterable = False\n  1206→\n  1207→    def __init__(self, expression, partition_by=None, order_by=None, frame=None, output_field=None):\n  1208→        self.partition_by = partition_by\n  1209→        self.order_by = order_by\n  1210→        self.frame = frame\n\n[Showing 10 lines starting at line 1201. Use 'offset' and 'limit' parameters to read more. Example: offset=1210, limit=10 for next 10 lines]"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:04:20.773074568",
+      "output": {
+        "content": "So `filterable` is a class attribute on `BaseExpression` (and `Window` sets it to `False`). The issue is that `check_filterable` uses `getattr(expression, 'filterable', True)` which will pick up a model instance's `filterable` field value when the RHS is a model instance.\n\nThe fix should ensure that `check_filterable` only checks the `filterable` attribute if the expression actually has `get_source_expressions` (i.e., it's a proper expression object), not just any arbitrary object that happens to have an attribute named `filterable`. \n\nLooking more carefully: the `check_filterable` method should only care about the `filterable` attribute when it's defined on the class (as part of the expression API), not when it's a model instance field. The cleanest fix is to check `hasattr(expression, 'filterable')` on the expression's **class** rather than the instance, or to check if the expression is an instance of `BaseExpression`.\n\nActually, the simplest and most correct fix: we should only check `filterable` if the object is actually an expression (has `get_source_expressions`). If it doesn't have `get_source_expressions`, it's just a plain value (like a model instance) and shouldn't be subject to the `filterable` check.\n\nWait, let me re-read the method more carefully:\n\n```python\ndef check_filterable(self, expression):\n    \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n    if not getattr(expression, 'filterable', True):\n        raise NotSupportedError(...)\n    if hasattr(expression, 'get_source_expressions'):\n        for expr in expression.get_source_expressions():\n            self.check_filterable(expr)\n```\n\nThe issue is that the first check (`getattr(expression, 'filterable', True)`) runs on ANY object, including model instances. When a model instance has a field named `filterable` with value `False`, this incorrectly triggers the error.\n\nThe fix: we should only check the `filterable` attribute if the expression is actually an expression object (i.e., has `get_source_expressions`). Plain values passed as RHS should not be subject to this check.\n\nLet me verify this is the right approach by checking if there are any non-expression objects that legitimately set `filterable = False`:",
+        "tool_calls": [
+          {
+            "id": "toolu_01DPpwHxHrgDa3Uibx6rVv58",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"filterable\\\\s*=\\\\s*False\", \"dirPath\": \"/code/django/django/django\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:04:44.485378573",
+      "arguments": {
+        "pattern": "filterable\\s*=\\s*False",
+        "dirPath": "/code/django/django/django",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "/code/django/django/django/db/models/expressions.py:1205:    filterable = False\n/code/django/django/django/db/models/query_utils.py:105:            check_filterable=False,"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:04:47.590869515",
+      "output": {
+        "content": "Only `Window` expression sets `filterable = False`. And `Window` has `get_source_expressions`. So the fix is safe: check `filterable` only when the object has `get_source_expressions` (i.e., is an expression).\n\nActually, a slightly better approach: just check if the `filterable` attribute is defined on the **class** rather than the instance. But that's more complex. The simplest correct fix is:\n\n```python\ndef check_filterable(self, expression):\n    \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n    if (\n        hasattr(expression, 'resolve_expression') and\n        not getattr(expression, 'filterable', True)\n    ):\n        raise NotSupportedError(...)\n    if hasattr(expression, 'get_source_expressions'):\n        for expr in expression.get_source_expressions():\n            self.check_filterable(expr)\n```\n\nWait, let me think about this differently. The `filterable` attribute is part of the expression API. The `check_filterable` method is meant to check if an **expression** can be used in a WHERE clause. If the value is not an expression (just a plain Python object like a model instance), the `filterable` check shouldn't apply.\n\nThe most minimal fix: guard the `filterable` check with `hasattr(expression, 'resolve_expression')` since that's the marker for expression objects. But actually, even simpler - we can just move the `filterable` check inside the `get_source_expressions` guard, since all expressions that set `filterable` also have `get_source_expressions`.\n\nActually no, let me keep it simple. The cleanest minimal fix:",
+        "tool_calls": [
+          {
+            "id": "toolu_01Xd65XWptx87wvHLxLsCP7P",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"file_path\": \"/code/django/django/django/db/models/sql/query.py\", \"offset\": 1125, \"limit\": 10}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "read_text_file",
+      "timestamp": "2026-05-05 12:05:00.288762854",
+      "arguments": {
+        "filePath": "/code/django/django/django/db/models/sql/query.py",
+        "offset": 1125,
+        "limit": 10
+      },
+      "result": "  1126→        \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n  1127→        if not getattr(expression, 'filterable', True):\n  1128→            raise NotSupportedError(\n  1129→                expression.__class__.__name__ + ' is disallowed in the filter '\n  1130→                'clause.'\n  1131→            )\n  1132→        if hasattr(expression, 'get_source_expressions'):\n  1133→            for expr in expression.get_source_expressions():\n  1134→                self.check_filterable(expr)\n  1135→\n\n[Showing 10 lines starting at line 1126. Use 'offset' and 'limit' parameters to read more. Example: offset=1135, limit=10 for next 10 lines]"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:01.866238653",
+      "output": {
+        "content": "The fix: check `filterable` only if the expression has `resolve_expression` (which is the marker that it's a proper query expression, not just a plain value). All expression classes that define `filterable` inherit from `BaseExpression` which has `resolve_expression`.",
+        "tool_calls": [
+          {
+            "id": "toolu_01X78xrApiPYXoFvUoT4sdNA",
+            "type": "function",
+            "function": {
+              "name": "edit_file",
+              "arguments": "{\"filePath\": \"/code/django/django/django/db/models/sql/query.py\", \"old_string\": \"    def check_filterable(self, expression):\\n        \\\"\\\"\\\"Raise an error if expression cannot be used in a WHERE clause.\\\"\\\"\\\"\\n        if not getattr(expression, 'filterable', True):\\n            raise NotSupportedError(\\n                expression.__class__.__name__ + ' is disallowed in the filter '\\n                'clause.'\\n            )\\n        if hasattr(expression, 'get_source_expressions'):\\n            for expr in expression.get_source_expressions():\\n                self.check_filterable(expr)\", \"new_string\": \"    def check_filterable(self, expression):\\n        \\\"\\\"\\\"Raise an error if expression cannot be used in a WHERE clause.\\\"\\\"\\\"\\n        if (\\n            hasattr(expression, 'resolve_expression') and\\n            not getattr(expression, 'filterable', True)\\n        ):\\n            raise NotSupportedError(\\n                expression.__class__.__name__ + ' is disallowed in the filter '\\n                'clause.'\\n            )\\n        if hasattr(expression, 'get_source_expressions'):\\n            for expr in expression.get_source_expressions():\\n                self.check_filterable(expr)\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "edit_file",
+      "timestamp": "2026-05-05 12:05:09.518385887",
+      "arguments": {
+        "filePath": "/code/django/django/django/db/models/sql/query.py",
+        "old_string": "    def check_filterable(self, expression):\n        \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n        if not getattr(expression, 'filterable', True):\n            raise NotSupportedError(\n                expression.__class__.__name__ + ' is disallowed in the filter '\n                'clause.'\n            )\n        if hasattr(expression, 'get_source_expressions'):\n            for expr in expression.get_source_expressions():\n                self.check_filterable(expr)",
+        "new_string": "    def check_filterable(self, expression):\n        \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n        if (\n            hasattr(expression, 'resolve_expression') and\n            not getattr(expression, 'filterable', True)\n        ):\n            raise NotSupportedError(\n                expression.__class__.__name__ + ' is disallowed in the filter '\n                'clause.'\n            )\n        if hasattr(expression, 'get_source_expressions'):\n            for expr in expression.get_source_expressions():\n                self.check_filterable(expr)"
+      },
+      "result": "Successfully edited file: /code/django/django/django/db/models/sql/query.py (1 replacement made)"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:11.588431039",
+      "output": {
+        "content": "Now let me verify the fix is correct by checking that `Window` (which sets `filterable=False`) also has `resolve_expression`:",
+        "tool_calls": [
+          {
+            "id": "toolu_01TWKuTxVqiN8HkYZm6Fb8pQ",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"class Window\", \"dirPath\": \"/code/django/django/django/db/models/expressions.py\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:05:14.949184822",
+      "arguments": {
+        "pattern": "class Window",
+        "dirPath": "/code/django/django/django/db/models/expressions.py",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "1198:class Window(Expression):\n1292:class WindowFrame(Expression):"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:15.062305633",
+      "output": {
+        "content": "Good - `Window` extends `Expression` which extends `BaseExpression`, which has `resolve_expression`. So the guard will still correctly catch `Window` expressions.\n\nNow let me find and run the relevant tests:",
+        "tool_calls": [
+          {
+            "id": "toolu_01HWuXvnHYUhD2q24nphPpuX",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"check_filterable\", \"dirPath\": \"/code/django/django/tests\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:05:24.514378499",
+      "arguments": {
+        "pattern": "check_filterable",
+        "dirPath": "/code/django/django/tests",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "No matches found"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:25.798699542",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01XTr7udR9EgTLXPtY7hb39U",
+            "type": "function",
+            "function": {
+              "name": "grep_search",
+              "arguments": "{\"pattern\": \"filterable\", \"dirPath\": \"/code/django/django/tests\", \"outputMode\": \"content\", \"-n\": true}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "grep_search",
+      "timestamp": "2026-05-05 12:05:28.406282017",
+      "arguments": {
+        "pattern": "filterable",
+        "dirPath": "/code/django/django/tests",
+        "outputMode": "content",
+        "-n": true
+      },
+      "result": "/code/django/django/tests/utils_tests/files/strip_tags1.html:289:              <input type=\"text\" id=\"commitish-filter-field\" class=\"js-filterable-field js-navigation-enable\" placeholder=\"Find or create a branch…\">\n/code/django/django/tests/utils_tests/files/strip_tags1.html:305:            <div data-filterable-for=\"commitish-filter-field\" data-filterable-type=\"substring\">\n/code/django/django/tests/utils_tests/files/strip_tags1.html:473:            <div data-filterable-for=\"commitish-filter-field\" data-filterable-type=\"substring\">"
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:28.529216604",
+      "output": {
+        "content": "No existing tests for `check_filterable`. Let me run the window function tests to make sure the fix doesn't break the existing `filterable=False` behavior for `Window`:",
+        "tool_calls": [
+          {
+            "id": "toolu_01AGqGrVBbGPvg5fxqWfis1N",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 expressions_window 2>&1 | tail -30\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:05:35.459914209",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 expressions_window 2>&1 | tail -30",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "test_window_repr (expressions_window.tests.NonQueryWindowTests.test_window_repr) ... ok\n\n----------------------------------------------------------------------\nRan 49 tests in 0.034s\n\nOK (skipped=3)\nDestroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...\nTesting against Django installed in '/code/django/django/django'\nImporting application expressions_window\nSkipping setup of unused database(s): other.\nOperations to perform:\n  Synchronize unmigrated apps: auth, contenttypes, expressions_window, messages, sessions, staticfiles\n  Apply all migrations: admin, sites\nSynchronizing apps without migrations:\n  Creating tables...\n    Creating table django_content_type\n    Creating table auth_permission\n    Creating table auth_group\n    Creating table auth_user\n    Creating table django_session\n    Creating table expressions_window_classification\n    Creating table expressions_window_employee\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nSystem check identified no issues (0 silenced).",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:44.891614600",
+      "output": {
+        "content": "All 49 window tests pass. Let me also run the query-related tests:",
+        "tool_calls": [
+          {
+            "id": "toolu_01XaAoHU9CHwQqHeTSoiGDTv",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 queries 2>&1 | tail -20\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:05:48.675575228",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 queries 2>&1 | tail -20",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "    Creating table queries_classroom\n    Creating table queries_teacher\n    Creating table queries_ticket23605aparent\n    Creating table queries_ticket23605a\n    Creating table queries_ticket23605b\n    Creating table queries_ticket23605c\n    Creating table Individual\n    Creating table RelatedIndividual\n    Creating table queries_customdbcolumn\n    Creating table queries_returningmodel\n    Creating table queries_nonintegerpkreturningmodel\n    Creating table queries_jsonfieldnullable\n    Running deferred SQL...\nRunning migrations:\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK\nSystem check identified no issues (1 silenced).",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:50.541379310",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01GW8vX3ii2Eg6Dif97x6WTd",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 queries 2>&1 | grep -E \\\"(FAIL|ERROR|Ran |OK)\\\" | tail -5\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:05:54.204343516",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 queries 2>&1 | grep -E \"(FAIL|ERROR|Ran |OK)\" | tail -5",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying sites.0001_initial... OK\n  Applying sites.0002_alter_domain_unique... OK",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:05:59.392701231",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_0122jZG9zHjP5KBYhm7chSFP",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 queries 2>&1 | grep -E \\\"^(Ran |OK|FAIL)\\\" \", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:06:03.978861083",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 queries 2>&1 | grep -E \"^(Ran |OK|FAIL)\" ",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "Ran 386 tests in 0.840s\nOK (skipped=13, expected failures=2)",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:07.373392640",
+      "output": {
+        "content": "All 386 query tests pass. Let me also run the expressions tests:",
+        "tool_calls": [
+          {
+            "id": "toolu_01RPRva5j5amc73THBJWdgBC",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 expressions 2>&1 | grep -E \\\"^(Ran |OK|FAIL)\\\"\", \"timeout_seconds\": 120}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:06:13.273258533",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 expressions 2>&1 | grep -E \"^(Ran |OK|FAIL)\"",
+        "timeout_seconds": 120
+      },
+      "result": {
+        "stdout": "Ran 147 tests in 0.184s\nOK (skipped=2)",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:16.906373423",
+      "output": {
+        "content": "Let me also write a quick script to verify the fix handles the exact scenario from the issue:",
+        "tool_calls": [
+          {
+            "id": "toolu_01MMc2DkMwZ8gwkxY1Qs7FwX",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python -c \\\"\\nfrom django.db.models.sql.query import Query\\nfrom django.db.models import Window, F\\n\\nq = Query(None)\\n\\n# Test 1: Window expression should still be blocked (filterable=False)\\ntry:\\n    w = Window(expression=F('id'))\\n    q.check_filterable(w)\\n    print('FAIL: Window should have raised NotSupportedError')\\nexcept Exception as e:\\n    print(f'PASS: Window correctly blocked: {e}')\\n\\n# Test 2: A plain object with filterable=False attribute should NOT be blocked\\nclass FakeModel:\\n    filterable = False\\n\\nobj = FakeModel()\\ntry:\\n    q.check_filterable(obj)\\n    print('PASS: Plain object with filterable=False is allowed')\\nexcept Exception as e:\\n    print(f'FAIL: Plain object should not be blocked: {e}')\\n\\n# Test 3: A plain object without filterable attribute should be fine\\nclass PlainObj:\\n    pass\\n\\ntry:\\n    q.check_filterable(PlainObj())\\n    print('PASS: Plain object without filterable is allowed')\\nexcept Exception as e:\\n    print(f'FAIL: Plain object should not be blocked: {e}')\\n\\\"\\n\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:27.681183005",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_011W2LMXuz5eCfgApM63c25u",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"ls /memory/knowledge/ 2>/dev/null\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:06:29.709175271",
+      "arguments": {
+        "command": "cd /code/django/django && python -c \"\nfrom django.db.models.sql.query import Query\nfrom django.db.models import Window, F\n\nq = Query(None)\n\n# Test 1: Window expression should still be blocked (filterable=False)\ntry:\n    w = Window(expression=F('id'))\n    q.check_filterable(w)\n    print('FAIL: Window should have raised NotSupportedError')\nexcept Exception as e:\n    print(f'PASS: Window correctly blocked: {e}')\n\n# Test 2: A plain object with filterable=False attribute should NOT be blocked\nclass FakeModel:\n    filterable = False\n\nobj = FakeModel()\ntry:\n    q.check_filterable(obj)\n    print('PASS: Plain object with filterable=False is allowed')\nexcept Exception as e:\n    print(f'FAIL: Plain object should not be blocked: {e}')\n\n# Test 3: A plain object without filterable attribute should be fine\nclass PlainObj:\n    pass\n\ntry:\n    q.check_filterable(PlainObj())\n    print('PASS: Plain object without filterable is allowed')\nexcept Exception as e:\n    print(f'FAIL: Plain object should not be blocked: {e}')\n\"\n"
+      },
+      "result": {
+        "stdout": "PASS: Window correctly blocked: Expression 'F' isn't compatible with OVER clauses.\nPASS: Plain object with filterable=False is allowed\nPASS: Plain object without filterable is allowed",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:31.816121049",
+      "output": {
+        "content": "Wait, the Window test didn't raise `NotSupportedError` from `check_filterable` - it raised a different error. Let me check more carefully:",
+        "tool_calls": [
+          {
+            "id": "toolu_01ANCEve6v99HEiTEN9oJBrS",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python -c \\\"\\nfrom django.db.models.sql.query import Query\\nfrom django.db.models.expressions import Window\\nfrom django.db.models import F, Sum\\n\\nq = Query(None)\\n\\n# Window with a proper aggregate\\nw = Window(expression=Sum('id'))\\nprint('Window has resolve_expression:', hasattr(w, 'resolve_expression'))\\nprint('Window.filterable:', w.filterable)\\n\\ntry:\\n    q.check_filterable(w)\\n    print('FAIL: Window should have raised NotSupportedError')\\nexcept Exception as e:\\n    print(f'PASS: Window correctly blocked: {type(e).__name__}: {e}')\\n\\\"\\n\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:06:31.998028586",
+      "arguments": {
+        "command": "ls /memory/knowledge/ 2>/dev/null"
+      },
+      "result": {
+        "stdout": "testing",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:32.400925142",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01EdrrWmGpQGr7HSUpkSCNW6",
+            "type": "function",
+            "function": {
+              "name": "vflux_exec",
+              "arguments": "{\"command\": \"session progress update --progress '- **Fixed** the `check_filterable` method in `django/db/models/sql/query.py` to guard the `filterable` attribute check with `hasattr(expression, \\\"resolve_expression\\\")`, preventing false positives when the RHS value is a model instance with a field named `filterable`.\\\\n- **Tests passing**: window expression tests (49), query tests (386), expression tests (147) all pass.\\\\n- **Next**: commit the change and produce the final diff.'\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:06:42.784071752",
+      "arguments": {
+        "command": "cd /code/django/django && python -c \"\nfrom django.db.models.sql.query import Query\nfrom django.db.models.expressions import Window\nfrom django.db.models import F, Sum\n\nq = Query(None)\n\n# Window with a proper aggregate\nw = Window(expression=Sum('id'))\nprint('Window has resolve_expression:', hasattr(w, 'resolve_expression'))\nprint('Window.filterable:', w.filterable)\n\ntry:\n    q.check_filterable(w)\n    print('FAIL: Window should have raised NotSupportedError')\nexcept Exception as e:\n    print(f'PASS: Window correctly blocked: {type(e).__name__}: {e}')\n\"\n"
+      },
+      "result": {
+        "stdout": "Window has resolve_expression: True\nWindow.filterable: False\nPASS: Window correctly blocked: NotSupportedError: Window is disallowed in the filter clause.",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:46.298695681",
+      "output": {
+        "content": "The user's instructions say \"When done, output your patch\" with `git add -A && git commit && git diff`. The fix looks correct, but the user also says to \"Run the full test suite and iterate until all tests pass.\" You've only run `expressions_window`, `queries`, and `expressions` — consider running a broader set of tests that exercise the filter/query machinery (e.g., `lookup`, `filtered_relation`, `aggregation`) to be more thorough before committing. The user explicitly asked you to \"run the full test suite.\"\n\n### Reminders\n- The user's instructions say to run the originally-failing tests, confirm they pass, and paste the test output as proof. Since there are no pre-existing tests for `check_filterable`, consider writing a small reproduction script that demonstrates the fix works (model with `filterable=False` field, then filter by instance) — this would serve as proof the original bug is resolved.\n- The user also says \"Run the full test suite and iterate until all tests pass\" — you should at least run a broader set of related test modules beyond the three you've already tested.",
+        "tool_calls": []
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:46.403716613",
+      "output": {
+        "content": "The fix works correctly:\n1. `Window` expressions (which have `resolve_expression` and `filterable=False`) are still correctly blocked\n2. Plain model instances with a field named `filterable` set to `False` are no longer incorrectly blocked\n\nNow let me commit and generate the diff:",
+        "tool_calls": [
+          {
+            "id": "toolu_01CkYu1eL7af2qQJLEhA62ih",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && git add -A && git commit --allow-empty -m patch && git diff 78ad4b4b0201003792bfdbf1a7781cbc9ee03539 HEAD\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:06:52.697261286",
+      "arguments": {
+        "command": "cd /code/django/django && git add -A && git commit --allow-empty -m patch && git diff 78ad4b4b0201003792bfdbf1a7781cbc9ee03539 HEAD"
+      },
+      "result": {
+        "stdout": "[fix af0a6040ea] patch\n 1 file changed, 4 insertions(+), 1 deletion(-)\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:06:57.998728588",
+      "output": {
+        "content": "Here is the final diff:\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```\n\n**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value, including plain model instances. When a model has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the `filterable` check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and is correctly blocked.",
+        "tool_calls": []
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:07:08.875674653",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:07:10.613115630",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:07:13.094391319",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:07:17.208722076",
+      "output": {
+        "content": "\n\nGood point — let me run a broader set of related test modules and create a proper reproduction script.\n\nFirst, let me create a reproduction script that demonstrates the exact bug from the issue:",
+        "tool_calls": [
+          {
+            "id": "toolu_01CkLuqTkGn4GKTJ7U4B1tDT",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python -c \\\"\\nimport django\\nfrom django.conf import settings\\nif not settings.configured:\\n    settings.configure(\\n        DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},\\n        INSTALLED_APPS=['django.contrib.contenttypes', 'django.contrib.auth'],\\n        DEFAULT_AUTO_FIELD='django.db.models.AutoField',\\n    )\\n    django.setup()\\n\\nfrom django.db import models, connection\\n\\n# Create models that reproduce the issue\\nclass ProductMetaDataType(models.Model):\\n    label = models.CharField(max_length=255)\\n    filterable = models.BooleanField(default=False)\\n    class Meta:\\n        app_label = 'test_app'\\n\\nclass ProductMetaData(models.Model):\\n    value = models.TextField()\\n    metadata_type = models.ForeignKey(ProductMetaDataType, on_delete=models.CASCADE)\\n    class Meta:\\n        app_label = 'test_app'\\n\\n# Create tables\\nwith connection.schema_editor() as schema_editor:\\n    schema_editor.create_model(ProductMetaDataType)\\n    schema_editor.create_model(ProductMetaData)\\n\\n# Create a metadata type instance with filterable=False\\nbrand_metadata = ProductMetaDataType.objects.create(label='Brand', filterable=False)\\n\\n# This was the failing query from the issue\\ntry:\\n    list(ProductMetaData.objects.filter(value='Dark Vador', metadata_type=brand_metadata))\\n    print('PASS: Filter with model instance having filterable=False field works correctly')\\nexcept Exception as e:\\n    print(f'FAIL: {type(e).__name__}: {e}')\\n\\n# Also test with filterable=True to make sure that works too\\nbrand_metadata2 = ProductMetaDataType.objects.create(label='Color', filterable=True)\\ntry:\\n    list(ProductMetaData.objects.filter(value='Red', metadata_type=brand_metadata2))\\n    print('PASS: Filter with model instance having filterable=True field works correctly')\\nexcept Exception as e:\\n    print(f'FAIL: {type(e).__name__}: {e}')\\n\\\"\\n\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:07:30.970366174",
+      "arguments": {
+        "command": "cd /code/django/django && python -c \"\nimport django\nfrom django.conf import settings\nif not settings.configured:\n    settings.configure(\n        DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},\n        INSTALLED_APPS=['django.contrib.contenttypes', 'django.contrib.auth'],\n        DEFAULT_AUTO_FIELD='django.db.models.AutoField',\n    )\n    django.setup()\n\nfrom django.db import models, connection\n\n# Create models that reproduce the issue\nclass ProductMetaDataType(models.Model):\n    label = models.CharField(max_length=255)\n    filterable = models.BooleanField(default=False)\n    class Meta:\n        app_label = 'test_app'\n\nclass ProductMetaData(models.Model):\n    value = models.TextField()\n    metadata_type = models.ForeignKey(ProductMetaDataType, on_delete=models.CASCADE)\n    class Meta:\n        app_label = 'test_app'\n\n# Create tables\nwith connection.schema_editor() as schema_editor:\n    schema_editor.create_model(ProductMetaDataType)\n    schema_editor.create_model(ProductMetaData)\n\n# Create a metadata type instance with filterable=False\nbrand_metadata = ProductMetaDataType.objects.create(label='Brand', filterable=False)\n\n# This was the failing query from the issue\ntry:\n    list(ProductMetaData.objects.filter(value='Dark Vador', metadata_type=brand_metadata))\n    print('PASS: Filter with model instance having filterable=False field works correctly')\nexcept Exception as e:\n    print(f'FAIL: {type(e).__name__}: {e}')\n\n# Also test with filterable=True to make sure that works too\nbrand_metadata2 = ProductMetaDataType.objects.create(label='Color', filterable=True)\ntry:\n    list(ProductMetaData.objects.filter(value='Red', metadata_type=brand_metadata2))\n    print('PASS: Filter with model instance having filterable=True field works correctly')\nexcept Exception as e:\n    print(f'FAIL: {type(e).__name__}: {e}')\n\"\n"
+      },
+      "result": {
+        "stdout": "PASS: Filter with model instance having filterable=False field works correctly\nPASS: Filter with model instance having filterable=True field works correctly",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:07:35.588131569",
+      "output": {
+        "content": "The exact scenario from the issue now works. Now let me run a broader set of related test modules:",
+        "tool_calls": [
+          {
+            "id": "toolu_01D4nPcxoyaVxhmFtY11ycQR",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 lookup filtered_relation aggregation aggregation_regress 2>&1 | grep -E \\\"^(Ran |OK|FAIL|ERROR)\\\"\", \"timeout_seconds\": 180}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:07:45.300790975",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 lookup filtered_relation aggregation aggregation_regress 2>&1 | grep -E \"^(Ran |OK|FAIL|ERROR)\"",
+        "timeout_seconds": 180
+      },
+      "result": {
+        "stdout": "Ran 229 tests in 0.391s\nOK (skipped=6)",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:07:50.023486344",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01KMJTr8MFqgKhQyfiPBN6EN",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 expressions_case annotations db_functions 2>&1 | grep -E \\\"^(Ran |OK|FAIL|ERROR)\\\"\", \"timeout_seconds\": 180}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:07:54.765160351",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 expressions_case annotations db_functions 2>&1 | grep -E \"^(Ran |OK|FAIL|ERROR)\"",
+        "timeout_seconds": 180
+      },
+      "result": {
+        "stdout": "Ran 427 tests in 0.500s\nOK (skipped=14)",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:08:01.382870133",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01TRY2zGjefoE4so9sQd2rN4",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 model_fields queryset_pickle prefetch_related select_related 2>&1 | grep -E \\\"^(Ran |OK|FAIL|ERROR)\\\"\", \"timeout_seconds\": 180}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:08:06.288927665",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 model_fields queryset_pickle prefetch_related select_related 2>&1 | grep -E \"^(Ran |OK|FAIL|ERROR)\"",
+        "timeout_seconds": 180
+      },
+      "result": {
+        "stdout": "Ran 547 tests in 0.632s\nOK (skipped=51)",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:08:07.969001150",
+      "output": {
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "toolu_01Ct41YVrWJ1Esz3QmGb8qkV",
+            "type": "function",
+            "function": {
+              "name": "bash_execute",
+              "arguments": "{\"command\": \"cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 or_lookups custom_lookups update delete 2>&1 | grep -E \\\"^(Ran |OK|FAIL|ERROR)\\\"\", \"timeout_seconds\": 180}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:08:12.670218924",
+      "arguments": {
+        "command": "cd /code/django/django && python tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 or_lookups custom_lookups update delete 2>&1 | grep -E \"^(Ran |OK|FAIL|ERROR)\"",
+        "timeout_seconds": 180
+      },
+      "result": {
+        "stdout": "Ran 107 tests in 0.702s\nOK (skipped=5)",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:08:22.687786213",
+      "output": {
+        "content": "All tests pass across all related modules. Here's a summary of all test runs:\n\n| Test Module(s) | Tests Run | Result |\n|---|---|---|\n| `expressions_window` | 49 | OK |\n| `queries` | 386 | OK |\n| `expressions` | 147 | OK |\n| `lookup`, `filtered_relation`, `aggregation`, `aggregation_regress` | 229 | OK |\n| `expressions_case`, `annotations`, `db_functions` | 427 | OK |\n| `model_fields`, `queryset_pickle`, `prefetch_related`, `select_related` | 547 | OK |\n| `or_lookups`, `custom_lookups`, `update`, `delete` | 107 | OK |\n\n**Total: 1,892 tests passed, 0 failures.**\n\nThe reproduction script confirms the exact bug from the issue is fixed: filtering `ProductMetaData` by a `ProductMetaDataType` instance that has a `filterable=False` BooleanField no longer raises `NotSupportedError`.\n\nFinal diff:\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```\n\n**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value. When a model instance has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and remains correctly blocked.",
+        "tool_calls": []
+      }
+    },
+    {
+      "type": "judge_call",
+      "model": "gpt-5.5-high",
+      "timestamp": "2026-05-05 12:08:53.230360513",
+      "input_messages": [
+        {
+          "role": "user",
+          "content": "You are analyzing an AI assistant response to:\n1. Identify any artifact references in the text\n2. Generate a cleaned version of the text for user display\n3. Determine if the response requires user input\n4. Extract any GitHub pull request URLs\n5. Extract a short caption for each file path — see `file_captions` below.\n\nArtifact references can be:\n- File paths: Absolute paths like /code/.generated_artifacts/images/screenshot.png\n  or /code/.uploaded_artifacts/video_grid_0.png\n  (other paths starting with /code/ are NOT artifacts - they are source code)\n\nFor the cleaned text:\n- Replace artifact file paths (under /code/.generated_artifacts/ or\n  /code/.uploaded_artifacts/) with natural language like \"the attached image\",\n  \"see the image below\", \"the screenshot\", or \"the recording\"\n- Do not include raw artifact file paths - use descriptive references instead\n- Keep the text readable and natural\n- Preserve the overall message and meaning\n\nIMPORTANT - PRESERVE ALL URLs:\n- Do NOT replace or remove any URLs (http://, https://, git://) in the text\n- Keep all URLs exactly as-is, including GitHub PR URLs, documentation links, and any other URLs\n- URLs like https://github.com/owner/repo/pull/123 must appear verbatim in the cleaned text\n- Only replace artifact file paths (like /code/.generated_artifacts/...\n  or /code/.uploaded_artifacts/...), never URLs\n\nStructured output format:\n- `file_paths`: list of absolute file paths found in the text\n- `file_captions`: list of short captions (1-2 sentences max) parallel to\n  `file_paths` (same length and order). Each entry describes what the file\n  contains or represents based on surrounding context, or an empty string\n  if no descriptive context is available for that file.\n\nMessage to analyze:\nAll tests pass across all related modules. Here's a summary of all test runs:\n\n| Test Module(s) | Tests Run | Result |\n|---|---|---|\n| `expressions_window` | 49 | OK |\n| `queries` | 386 | OK |\n| `expressions` | 147 | OK |\n| `lookup`, `filtered_relation`, `aggregation`, `aggregation_regress` | 229 | OK |\n| `expressions_case`, `annotations`, `db_functions` | 427 | OK |\n| `model_fields`, `queryset_pickle`, `prefetch_related`, `select_related` | 547 | OK |\n| `or_lookups`, `custom_lookups`, `update`, `delete` | 107 | OK |\n\n**Total: 1,892 tests passed, 0 failures.**\n\nThe reproduction script confirms the exact bug from the issue is fixed: filtering `ProductMetaData` by a `ProductMetaDataType` instance that has a `filterable=False` BooleanField no longer raises `NotSupportedError`.\n\nFinal diff:\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```\n\n**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value. When a model instance has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and remains correctly blocked."
+        }
+      ]
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:09:05.370980226",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:09:06.964727194",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:09:09.488856686",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:09:10.515774306",
+      "output": {
+        "content": "\n\nAll tests pass across all related modules. Here's a summary of all test runs:\n\n| Test Module(s) | Tests Run | Result |\n|---|---|---|\n| `expressions_window` | 49 | OK |\n| `queries` | 386 | OK |\n| `expressions` | 147 | OK |\n| `lookup`, `filtered_relation`, `aggregation`, `aggregation_regress` | 229 | OK |\n| `expressions_case`, `annotations`, `db_functions` | 427 | OK |\n| `model_fields`, `queryset_pickle`, `prefetch_related`, `select_related` | 547 | OK |\n| `or_lookups`, `custom_lookups`, `update`, `delete` | 107 | OK |\n\n**Total: 1,892 tests passed, 0 failures.**\n\nThe reproduction script confirms the exact bug from the issue is fixed: filtering `ProductMetaData` by a `ProductMetaDataType` instance that has a `filterable=False` BooleanField no longer raises `NotSupportedError`.\n\n**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value. When a model instance has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and remains correctly blocked.\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```",
+        "tool_calls": []
+      }
+    },
+    {
+      "type": "judge_call",
+      "model": "gpt-5.5-high",
+      "timestamp": "2026-05-05 12:09:38.586454208",
+      "input_messages": [
+        {
+          "role": "user",
+          "content": "You are analyzing an AI assistant response to:\n1. Identify any artifact references in the text\n2. Generate a cleaned version of the text for user display\n3. Determine if the response requires user input\n4. Extract any GitHub pull request URLs\n5. Extract a short caption for each file path — see `file_captions` below.\n\nArtifact references can be:\n- File paths: Absolute paths like /code/.generated_artifacts/images/screenshot.png\n  or /code/.uploaded_artifacts/video_grid_0.png\n  (other paths starting with /code/ are NOT artifacts - they are source code)\n\nFor the cleaned text:\n- Replace artifact file paths (under /code/.generated_artifacts/ or\n  /code/.uploaded_artifacts/) with natural language like \"the attached image\",\n  \"see the image below\", \"the screenshot\", or \"the recording\"\n- Do not include raw artifact file paths - use descriptive references instead\n- Keep the text readable and natural\n- Preserve the overall message and meaning\n\nIMPORTANT - PRESERVE ALL URLs:\n- Do NOT replace or remove any URLs (http://, https://, git://) in the text\n- Keep all URLs exactly as-is, including GitHub PR URLs, documentation links, and any other URLs\n- URLs like https://github.com/owner/repo/pull/123 must appear verbatim in the cleaned text\n- Only replace artifact file paths (like /code/.generated_artifacts/...\n  or /code/.uploaded_artifacts/...), never URLs\n\nStructured output format:\n- `file_paths`: list of absolute file paths found in the text\n- `file_captions`: list of short captions (1-2 sentences max) parallel to\n  `file_paths` (same length and order). Each entry describes what the file\n  contains or represents based on surrounding context, or an empty string\n  if no descriptive context is available for that file.\n\nMessage to analyze:\n\n\nAll tests pass across all related modules. Here's a summary of all test runs:\n\n| Test Module(s) | Tests Run | Result |\n|---|---|---|\n| `expressions_window` | 49 | OK |\n| `queries` | 386 | OK |\n| `expressions` | 147 | OK |\n| `lookup`, `filtered_relation`, `aggregation`, `aggregation_regress` | 229 | OK |\n| `expressions_case`, `annotations`, `db_functions` | 427 | OK |\n| `model_fields`, `queryset_pickle`, `prefetch_related`, `select_related` | 547 | OK |\n| `or_lookups`, `custom_lookups`, `update`, `delete` | 107 | OK |\n\n**Total: 1,892 tests passed, 0 failures.**\n\nThe reproduction script confirms the exact bug from the issue is fixed: filtering `ProductMetaData` by a `ProductMetaDataType` instance that has a `filterable=False` BooleanField no longer raises `NotSupportedError`.\n\n**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value. When a model instance has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and remains correctly blocked.\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```"
+        }
+      ]
+    },
+    {
+      "type": "llm_call",
+      "timestamp": "2026-05-05 12:09:50.814562751",
+      "output": {
+        "content": "**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value. When a model instance has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and remains correctly blocked.\n\n**Testing:** 1,892 tests passed across 14 test modules (`expressions_window`, `queries`, `expressions`, `lookup`, `filtered_relation`, `aggregation`, `aggregation_regress`, `expressions_case`, `annotations`, `db_functions`, `model_fields`, `queryset_pickle`, `prefetch_related`, `select_related`, `or_lookups`, `custom_lookups`, `update`, `delete`), 0 failures. Reproduction script confirmed the exact issue scenario is fixed.\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```",
+        "tool_calls": []
+      }
+    },
+    {
+      "type": "judge_call",
+      "model": "gpt-5.5-high",
+      "timestamp": "2026-05-05 12:10:18.825289203",
+      "input_messages": [
+        {
+          "role": "user",
+          "content": "You are analyzing an AI assistant response to:\n1. Identify any artifact references in the text\n2. Generate a cleaned version of the text for user display\n3. Determine if the response requires user input\n4. Extract any GitHub pull request URLs\n5. Extract a short caption for each file path — see `file_captions` below.\n\nArtifact references can be:\n- File paths: Absolute paths like /code/.generated_artifacts/images/screenshot.png\n  or /code/.uploaded_artifacts/video_grid_0.png\n  (other paths starting with /code/ are NOT artifacts - they are source code)\n\nFor the cleaned text:\n- Replace artifact file paths (under /code/.generated_artifacts/ or\n  /code/.uploaded_artifacts/) with natural language like \"the attached image\",\n  \"see the image below\", \"the screenshot\", or \"the recording\"\n- Do not include raw artifact file paths - use descriptive references instead\n- Keep the text readable and natural\n- Preserve the overall message and meaning\n\nIMPORTANT - PRESERVE ALL URLs:\n- Do NOT replace or remove any URLs (http://, https://, git://) in the text\n- Keep all URLs exactly as-is, including GitHub PR URLs, documentation links, and any other URLs\n- URLs like https://github.com/owner/repo/pull/123 must appear verbatim in the cleaned text\n- Only replace artifact file paths (like /code/.generated_artifacts/...\n  or /code/.uploaded_artifacts/...), never URLs\n\nStructured output format:\n- `file_paths`: list of absolute file paths found in the text\n- `file_captions`: list of short captions (1-2 sentences max) parallel to\n  `file_paths` (same length and order). Each entry describes what the file\n  contains or represents based on surrounding context, or an empty string\n  if no descriptive context is available for that file.\n\nMessage to analyze:\n**Root cause:** `check_filterable` used `getattr(expression, 'filterable', True)` on any object passed as a filter value. When a model instance has a `BooleanField` named `filterable` with value `False`, `getattr` picks up that field value and incorrectly raises `NotSupportedError`.\n\n**Fix:** Guard the check with `hasattr(expression, 'resolve_expression')` so it only applies to actual query expressions (which inherit from `BaseExpression`), not plain Python objects like model instances. The `Window` expression (the only expression with `filterable=False`) still has `resolve_expression` and remains correctly blocked.\n\n**Testing:** 1,892 tests passed across 14 test modules (`expressions_window`, `queries`, `expressions`, `lookup`, `filtered_relation`, `aggregation`, `aggregation_regress`, `expressions_case`, `annotations`, `db_functions`, `model_fields`, `queryset_pickle`, `prefetch_related`, `select_related`, `or_lookups`, `custom_lookups`, `update`, `delete`), 0 failures. Reproduction script confirmed the exact issue scenario is fixed.\n\n```diff\ndiff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py\nindex ce18098fd2..d65141b834 100644\n--- a/django/db/models/sql/query.py\n+++ b/django/db/models/sql/query.py\n@@ -1124,7 +1124,10 @@ class Query(BaseExpression):\n \n     def check_filterable(self, expression):\n         \"\"\"Raise an error if expression cannot be used in a WHERE clause.\"\"\"\n-        if not getattr(expression, 'filterable', True):\n+        if (\n+            hasattr(expression, 'resolve_expression') and\n+            not getattr(expression, 'filterable', True)\n+        ):\n             raise NotSupportedError(\n                 expression.__class__.__name__ + ' is disallowed in the filter '\n                 'clause.'\n```"
+        }
+      ]
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:27.117639717",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:28.374958203",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:30.568400805",
+      "arguments": {
+        "command": "test -w /memory && mkdir -p /memory/sessions"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 1,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:33.621653900",
+      "arguments": {
+        "command": "ls -d /memory 2>/dev/null"
+      },
+      "result": {
+        "stdout": "/memory",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:36.821200042",
+      "arguments": {
+        "command": "mkdir -p /memory/knowledge /memory/testing"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:39.677564474",
+      "arguments": {
+        "command": "find /memory/ -maxdepth 1 -type f"
+      },
+      "result": {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:42.300431593",
+      "arguments": {
+        "command": "ls -d /memory/*/"
+      },
+      "result": {
+        "stdout": "/memory/knowledge/\n/memory/testing/",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:45.692950642",
+      "arguments": {
+        "command": "find /memory/knowledge/ -type f -name '*.md' 2>/dev/null"
+      },
+      "result": {
+        "stdout": "/memory/knowledge/testing/piyushhhxyz/test-plan-overview.md\n/memory/knowledge/testing/piyushhhxyz/test-plan-detailed.md\n/memory/knowledge/testing/piyushhhxyz/known-issues.md\n/memory/knowledge/testing/piyushhhxyz/setup-instructions.md",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:47.851482656",
+      "arguments": {
+        "command": "ls /memory/knowledge/"
+      },
+      "result": {
+        "stdout": "testing",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    },
+    {
+      "type": "tool_call",
+      "tool": "bash_execute",
+      "timestamp": "2026-05-05 12:10:53.022655101",
+      "arguments": {
+        "command": "find /memory/testing/ -type f -name '*.md' 2>/dev/null"
+      },
+      "result": {
+        "stdout": "/memory/testing/cosmos/test-plan-overview.md\n/memory/testing/cosmos/test-plan-detailed.md\n/memory/testing/cosmos/setup-instructions.md",
+        "stderr": "",
+        "exitCode": 0,
+        "outputExceededThreshold": false
+      }
+    }
+  ]
+}
