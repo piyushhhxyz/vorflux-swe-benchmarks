@@ -8,7 +8,7 @@ This repository contains all artifacts needed for independent verification: pred
 
 | Benchmark | Harness | Resolved | Total | Rate |
 |:---|:---|:---|:---|:---|
-| SWE-bench Verified | [Opus 4.6 Code + GPT-5.5 High Review](evaluation/verified/20250519_vorflux_opus46-code_gpt55h-review/) | 413 | 500 | **82.6%** |
+| SWE-bench Verified | [Opus 4.6 Code + GPT-5.5 High Review](evaluation/verified/20250519_vorflux_opus46-code_gpt55h-review/) | 442 | 500 | **88.4%** |
 
 ## Repository Structure
 

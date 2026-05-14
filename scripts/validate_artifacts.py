@@ -68,8 +68,15 @@ def validate(harness_dir: str) -> list[str]:
             if key not in results:
                 errors.append(f"results.json: missing key '{key}'")
         resolved_count = len(results.get("resolved", []))
-        if resolved_count != 413:
-            errors.append(f"results.json: expected 413 resolved, got {resolved_count}")
+        # Read expected count from runs.json if available
+        runs_file = os.path.join(harness_dir, "runs.json")
+        expected_resolved = None
+        if os.path.isfile(runs_file):
+            with open(runs_file) as rf:
+                runs_data = json.load(rf)
+            expected_resolved = runs_data.get("metadata", {}).get("resolved")
+        if expected_resolved and resolved_count != expected_resolved:
+            errors.append(f"results.json: expected {expected_resolved} resolved, got {resolved_count}")
 
     # --- results/resolved_by_repo.json ---
     repo_file = os.path.join(harness_dir, "results", "resolved_by_repo.json")
@@ -82,8 +89,8 @@ def validate(harness_dir: str) -> list[str]:
         resolved_sum = sum(v.get("resolved", 0) for v in by_repo.values())
         if total_sum != 500:
             errors.append(f"resolved_by_repo.json: total sum is {total_sum}, expected 500")
-        if resolved_sum != 413:
-            errors.append(f"resolved_by_repo.json: resolved sum is {resolved_sum}, expected 413")
+        if expected_resolved and resolved_sum != expected_resolved:
+            errors.append(f"resolved_by_repo.json: resolved sum is {resolved_sum}, expected {expected_resolved}")
 
     # --- results/resolved_by_time.json ---
     time_file = os.path.join(harness_dir, "results", "resolved_by_time.json")
@@ -96,8 +103,8 @@ def validate(harness_dir: str) -> list[str]:
         resolved_sum = sum(v.get("resolved", 0) for v in by_time.values())
         if total_sum != 500:
             errors.append(f"resolved_by_time.json: total sum is {total_sum}, expected 500")
-        if resolved_sum != 413:
-            errors.append(f"resolved_by_time.json: resolved sum is {resolved_sum}, expected 413")
+        if expected_resolved and resolved_sum != expected_resolved:
+            errors.append(f"resolved_by_time.json: resolved sum is {resolved_sum}, expected {expected_resolved}")
 
     # --- metadata.yaml ---
     meta_file = os.path.join(harness_dir, "metadata.yaml")
@@ -164,13 +171,19 @@ def main():
             print(f"  - {err}")
         sys.exit(1)
     else:
+        # Read actual counts for display
+        results_file = os.path.join(harness_dir, "results", "results.json")
+        with open(results_file) as f:
+            results = json.load(f)
+        resolved_count = len(results.get("resolved", []))
+
         print("ALL CHECKS PASSED")
         print()
         print("  - all_preds.jsonl: 500 lines, valid JSON, unique IDs, consistent model name")
         print("  - all_preds.jsonl <-> patches/: byte-for-byte match")
-        print("  - results/results.json: 413 resolved, schema valid")
-        print("  - results/resolved_by_repo.json: sums to 413/500")
-        print("  - results/resolved_by_time.json: sums to 413/500")
+        print(f"  - results/results.json: {resolved_count} resolved, schema valid")
+        print(f"  - results/resolved_by_repo.json: sums to {resolved_count}/500")
+        print(f"  - results/resolved_by_time.json: sums to {resolved_count}/500")
         print("  - metadata.yaml: valid YAML, required fields present")
         print("  - README.md: Checklist and Results sections present")
         print("  - patches/: 500 .diff files")

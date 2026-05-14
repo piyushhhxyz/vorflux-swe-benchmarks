@@ -6,36 +6,41 @@ This directory contains the full evaluation results for Vorflux's first harness 
 
 ```
 ==================================================
-Resolved 413 instances (82.6%)
+Resolved 442 instances (88.4%)
+Resolved (clean, no contamination): 437 (87.4%)
 ==================================================
 Resolved by Repository
-- astropy/astropy: 12/22 (54.5%)
-- django/django: 202/231 (87.4%)
-- matplotlib/matplotlib: 27/34 (79.4%)
-- mwaskom/seaborn: 1/2 (50.0%)
+- astropy/astropy: 16/22 (72.7%)
+- django/django: 213/231 (92.2%)
+- matplotlib/matplotlib: 28/34 (82.4%)
+- mwaskom/seaborn: 2/2 (100.0%)
 - pallets/flask: 1/1 (100.0%)
-- psf/requests: 6/8 (75.0%)
+- psf/requests: 8/8 (100.0%)
 - pydata/xarray: 19/22 (86.4%)
 - pylint-dev/pylint: 5/10 (50.0%)
-- pytest-dev/pytest: 18/19 (94.7%)
-- scikit-learn/scikit-learn: 27/32 (84.4%)
-- sphinx-doc/sphinx: 35/44 (79.5%)
-- sympy/sympy: 60/75 (80.0%)
+- pytest-dev/pytest: 16/19 (84.2%)
+- scikit-learn/scikit-learn: 31/32 (96.9%)
+- sphinx-doc/sphinx: 38/44 (86.4%)
+- sympy/sympy: 65/75 (86.7%)
 ==================================================
 Resolved by Time
-- 2013: 2/3 (66.7%)
-- 2014: 1/2 (50.0%)
+- 2013: 3/3 (100.0%)
+- 2014: 2/2 (100.0%)
 - 2015: 1/1 (100.0%)
 - 2016: 2/2 (100.0%)
 - 2017: 15/16 (93.8%)
-- 2018: 19/24 (79.2%)
-- 2019: 83/98 (84.7%)
-- 2020: 92/108 (85.2%)
-- 2021: 66/86 (76.7%)
-- 2022: 85/102 (83.3%)
-- 2023: 47/58 (81.0%)
+- 2018: 22/24 (91.7%)
+- 2019: 87/98 (88.8%)
+- 2020: 95/108 (88.0%)
+- 2021: 71/86 (82.6%)
+- 2022: 92/102 (90.2%)
+- 2023: 52/58 (89.7%)
 ==================================================
 ```
+
+## Contamination
+
+10 instances were flagged by the contamination judge. Of those, 5 were resolved and 5 were not resolved. The clean resolve rate (excluding contaminated instances) is **87.4%** (437/500).
 
 ## System Description
 
@@ -69,11 +74,11 @@ See [CONFIGURATION.md](CONFIGURATION.md) for full details on evaluation paramete
 | [`results/resolved_by_time.json`](results/resolved_by_time.json) | Results broken down by year |
 | [`patches/`](patches/) | Individual `.diff` files for all 500 instances |
 | [`trajs/`](trajs/) | Agent trajectories (pending export from Laminar) |
-| [`runs.json`](runs.json) | Per-instance metadata with session links and trace IDs |
+| [`runs.json`](runs.json) | Per-instance metadata with session links, trace IDs, and contamination status |
 | [`metadata.yaml`](metadata.yaml) | Official SWE-bench metadata |
 | [`CONFIGURATION.md`](CONFIGURATION.md) | Detailed harness configuration |
 
-**Note:** All 500 instances have non-empty generated patches. The 87 unresolved instances produced patches that did not pass the SWE-bench test suite.
+**Note:** All 500 instances have non-empty generated patches. The 58 unresolved instances produced patches that did not pass the SWE-bench test suite.
 
 ## Checklist
 
