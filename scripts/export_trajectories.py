@@ -84,11 +84,12 @@ def query_laminar(
                 else:
                     print(f"  Rate limited (429), exhausted retries")
                     return []
+            if resp.status_code >= 400 and resp.status_code != 429:
+                print(f"  Laminar query error: HTTP {resp.status_code}")
+                return []
             resp.raise_for_status()
             body = resp.json()
             return body.get("data", []) if isinstance(body, dict) else []
-        except requests.exceptions.HTTPError:
-            raise  # re-raise non-429 HTTP errors
         except Exception as exc:
             print(f"  Laminar query failed: {exc}")
             return []
@@ -199,20 +200,47 @@ def format_judge_span(span: dict) -> dict:
     return entry
 
 
-def export_session(
-    session_id: str, instance_id: str, api_key: str
-) -> dict[str, Any] | None:
-    """Export a single session's trajectory from Laminar."""
+def fetch_spans_paginated(
+    session_id: str, api_key: str, batch_size: int = 500
+) -> list[dict[str, Any]]:
+    """Fetch all spans for a session, paginating for large sessions."""
     sid = session_id.replace("'", "''")
-
-    # Fetch all spans for this session
-    query = (
+    base_query = (
         f"SELECT name, input, output, start_time, end_time, parent_span_id "
         f"FROM spans "
         f"WHERE trace_id IN (SELECT id FROM traces WHERE session_id = '{sid}') "
         f"ORDER BY start_time ASC"
     )
-    spans = query_laminar(query, api_key)
+
+    # Try without pagination first
+    spans = query_laminar(base_query, api_key)
+    if spans:
+        return spans
+
+    # If that failed (likely 400 for large sessions), paginate
+    print(f"  Paginating (large session)...")
+    all_spans: list[dict[str, Any]] = []
+    offset = 0
+    while True:
+        batch = query_laminar(
+            f"{base_query} LIMIT {batch_size} OFFSET {offset}", api_key
+        )
+        if not batch:
+            break
+        all_spans.extend(batch)
+        offset += batch_size
+        if len(batch) < batch_size:
+            break
+        time.sleep(1)
+
+    return all_spans
+
+
+def export_session(
+    session_id: str, instance_id: str, api_key: str
+) -> dict[str, Any] | None:
+    """Export a single session's trajectory from Laminar."""
+    spans = fetch_spans_paginated(session_id, api_key)
 
     if not spans:
         return None
@@ -273,10 +301,9 @@ def main():
         "--dry-run", action="store_true", help="Show what would be exported"
     )
     parser.add_argument(
-        "--parallelism",
-        type=int,
-        default=3,
-        help="Max concurrent requests (default: 3, keep low to avoid rate limits)",
+        "--skip-existing",
+        action="store_true",
+        help="Skip instances that already have a trajectory file",
     )
     args = parser.parse_args()
 
@@ -303,11 +330,19 @@ def main():
             print(f"  {iid}: session={r['session_id']}")
         return
 
+    skipped = 0
     success = 0
     failed = 0
     for i, iid in enumerate(instance_ids):
         r = runs[iid]
         session_id = r["session_id"]
+
+        # Skip if trajectory already exists
+        output_file = os.path.join(trajs_dir, f"{iid}.json")
+        if args.skip_existing and os.path.isfile(output_file):
+            skipped += 1
+            continue
+
         print(f"[{i+1}/{len(instance_ids)}] {iid} (session={session_id[:8]}...)")
 
         result = export_session(session_id, iid, api_key)
@@ -330,7 +365,7 @@ def main():
         if i < len(instance_ids) - 1:
             time.sleep(1.0)
 
-    print(f"\nDone: {success} exported, {failed} failed")
+    print(f"\nDone: {success} exported, {failed} failed, {skipped} skipped")
 
 
 if __name__ == "__main__":
